@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bil — Leie ut, beholde eller selge?</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,700;1,300&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500&display=swap');
+  :root {
+    --bg:#f7f4ef;--surface:#ffffff;--surface2:#f0ece4;
+    --border:#e0d9ce;--accent:#c17a3a;--text:#1a1714;
+    --muted:#8a8078;--green:#3a7a5a;--red:#8a3a3a;
+    --blue:#3a5a8a;--purple:#6a4a8a;--orange:#b8632e;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-weight:300;}
+  header{padding:36px 32px 22px;border-bottom:1px solid var(--border);background:var(--surface);}
+  header h1{font-family:'Fraunces',serif;font-size:clamp(20px,4vw,34px);font-weight:400;color:var(--accent);}
+  header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;}
+  .hub-lenke{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;padding-top:4px;}
+  .hub-lenke:hover{color:var(--accent);}
+  header p{font-size:12px;color:var(--muted);margin-top:5px;font-family:'IBM Plex Mono',monospace;}
+  .layout{display:grid;grid-template-columns:380px 1fr;min-height:calc(100vh - 90px);}
+  .sidebar{background:var(--surface);border-right:1px solid var(--border);padding:24px 22px;overflow-y:auto;}
+  .main{padding:26px 30px;overflow-y:auto;}
+  .section-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;padding-bottom:7px;border-bottom:1px solid var(--border);}
+  .sidebar-section{margin-bottom:26px;}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:11px;color:var(--muted);margin-bottom:5px;font-family:'IBM Plex Mono',monospace;}
+  .field-row{display:flex;align-items:center;gap:8px;}
+  input[type="range"]{flex:1;-webkit-appearance:none;height:2px;background:var(--border);border-radius:2px;outline:none;}
+  input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;background:var(--accent);border-radius:50%;cursor:pointer;transition:transform .15s;}
+  input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.3);}
+  .val{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent);min-width:96px;text-align:right;}
+  .toggle-btn{flex:1;padding:6px 8px;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer;border-radius:2px;transition:all .15s;}
+  .toggle-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:500;}
+  .toggle-btn:hover:not(.active){border-color:var(--accent);color:var(--accent);}
+  .infobox{font-size:11px;color:#776e63;font-family:'IBM Plex Mono',monospace;line-height:1.6;background:var(--surface2);padding:9px 11px;border-radius:2px;border:1px solid var(--border);margin-bottom:12px;}
+  .infobox.warn{border-color:#e0cfa8;background:#faf3e2;color:#8a6d2e;}
+  .infobox.green{border-color:#cfe6d6;color:#3a7a5a;background:#eef6f0;}
+  .auto-badge{font-size:9px;font-family:'IBM Plex Mono',monospace;color:var(--accent);background:#fbeede;border:1px solid #e8cfa6;border-radius:2px;padding:1px 5px;margin-left:5px;vertical-align:middle;}
+  /* alder chips */
+  .alder-chips{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;}
+  .chip{padding:4px 8px;font-family:'IBM Plex Mono',monospace;font-size:9px;border-radius:2px;border:1px solid var(--border);color:var(--muted);}
+  .chip.on{background:var(--accent);color:#fff;border-color:var(--accent);}
+  /* results */
+  .verdict{background:var(--surface2);border:1px solid var(--border);border-radius:2px;padding:22px 26px;margin-bottom:24px;position:relative;overflow:hidden;}
+  .verdict::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);}
+  .verdict.leie::before{background:var(--green);}
+  .verdict.beholde::before{background:var(--blue);}
+  .verdict.selge::before{background:var(--red);}
+  .verdict-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
+  .verdict-title{font-family:'Fraunces',serif;font-size:24px;font-weight:700;margin-bottom:7px;}
+  .verdict-title.green{color:var(--green);}.verdict-title.red{color:var(--red);}.verdict-title.blue{color:var(--blue);}.verdict-title.neutral{color:var(--accent);}
+  .verdict-sub{font-size:13px;color:var(--muted);line-height:1.6;}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px;}
+  .card{background:var(--surface2);border:1px solid var(--border);border-radius:2px;padding:18px;}
+  .card-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:9px;}
+  .card-value{font-family:'Fraunces',serif;font-size:21px;font-weight:700;color:var(--accent);}
+  .card-value.green{color:var(--green);}.card-value.red{color:var(--red);}.card-value.blue{color:var(--blue);}
+  .card-sub{font-size:11px;color:var(--muted);margin-top:4px;font-family:'IBM Plex Mono',monospace;}
+  .breakdown{background:var(--surface2);border:1px solid var(--border);border-radius:2px;margin-bottom:24px;}
+  .breakdown-header{padding:12px 18px;border-bottom:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+  table{width:100%;border-collapse:collapse;}
+  td{padding:10px 18px;font-size:13px;border-bottom:1px solid #e8e2d6;}
+  td:last-child{text-align:right;font-family:'IBM Plex Mono',monospace;font-size:12px;}
+  tr.subtotal td{border-top:1px solid var(--border);font-weight:500;}
+  tr.total td{border-top:1px solid var(--accent);font-weight:500;color:var(--accent);font-size:14px;}
+  .pos{color:var(--green);}.neg{color:var(--red);}
+  .chart-wrap{background:var(--surface2);border:1px solid var(--border);border-radius:2px;padding:22px;margin-bottom:24px;}
+  .chart-title{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:18px;}
+  canvas{width:100% !important;}
+  .md-wrap{margin-bottom:24px;}
+  .md-header{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #cfe6d6;}
+  .md-row{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--surface2);border:1px solid var(--border);border-radius:2px;padding:14px 18px;margin-bottom:8px;}
+  .md-name{font-size:13px;color:var(--text);}.md-info{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);}
+  .md-val{font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:var(--green);text-align:right;}
+  .md-val span{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);}
+  .md-sub{font-family:'IBM Plex Mono',monospace;font-size:10px;text-align:right;margin-top:2px;color:var(--muted);}
+  .sens-wrap{margin-bottom:24px;padding:22px;background:var(--surface2);border:1px solid var(--border);border-radius:2px;}
+  .sens-header{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+  .sens-intro{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.5;}
+  .sens-row{display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:center;margin-bottom:10px;}
+  .sens-rank{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#b0a89a;}
+  .sens-name{font-size:12px;color:var(--text);margin-bottom:5px;}
+  .sens-ret{color:var(--muted);font-size:11px;}
+  .sens-bar-wrap{height:4px;background:var(--border);border-radius:2px;}
+  .sens-bar{height:4px;border-radius:2px;}
+  .sens-bar.pos{background:var(--green);}.sens-bar.neg{background:var(--red);}
+  .sens-val{font-family:'IBM Plex Mono',monospace;font-size:11px;min-width:80px;text-align:right;}
+  .rt-wrap{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+  .rt-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);}
+  .badge{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:3px 9px;border-radius:10px;border:1px solid;}
+  .badge.inv{background:#fbeede;border-color:var(--accent);color:var(--accent);}
+  .badge.eget{background:#e9eef5;border-color:var(--blue);color:var(--blue);}
+  .badge.elbil{background:#eef6f0;border-color:var(--green);color:var(--green);}
+  .note{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.7;padding:13px 18px;background:var(--surface2);border:1px solid var(--border);border-radius:2px;margin-bottom:16px;}
+  @media(max-width:820px){.layout{grid-template-columns:1fr;}.sidebar{border-right:none;border-bottom:1px solid var(--border);}}
+  @media(max-width:500px){.cards{grid-template-columns:1fr;}header,.sidebar,.main{padding:18px 14px;}}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Bil — Leie ut, beholde eller selge?</h1>
+    <p>Investeringsanalyse · Privatbil / utleiebil · Peer-to-peer</p>
+  </div>
+  <a class="hub-lenke" href="../index.html">← KalkulatorHub</a>
+</header>
+
+<script src="../js/global.js"></script>
+
+<div class="layout">
+<aside class="sidebar">
+
+  <div class="sidebar-section">
+    <div class="section-label">Bilens formål</div>
+    <div class="field">
+      <label>Hva er bilen primært til?</label>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="toggle-btn" id="btn-inv" onclick="setModus('investering')">Investering / utleie</button>
+        <button class="toggle-btn active" id="btn-eget" onclick="setModus('egetbruk')">Primært eget bruk</button>
+      </div>
+    </div>
+    <div class="infobox warn" id="modus-info">
+      ℹ Eget bruk: bilen beholdes uansett. Analysen viser om det lønner seg å leie ut når den ellers ville stått.
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label">Biltype</div>
+    <div class="field">
+      <label>Drivstoff</label>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="toggle-btn active" id="btn-bensin" onclick="setBiltype('bensin')">Bensin/Diesel</button>
+        <button class="toggle-btn" id="btn-elbil" onclick="setBiltype('elbil')">Elbil</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Bilens alder ved kjøp / nå (år)</label>
+      <div class="field-row"><input type="range" id="alder" min="0" max="15" step="1" value="0"><span class="val" id="alder-val"></span></div>
+      <div class="alder-chips" id="alder-chips"></div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label">Eierperiode</div>
+    <div class="field">
+      <label>Antall år du planlegger å eie bilen</label>
+      <div class="field-row"><input type="range" id="horisont" min="1" max="10" step="1" value="5"><span class="val" id="horisont-val"></span></div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label">Bilens verdier</div>
+    <div class="field">
+      <label>Markedsverdi nå</label>
+      <div class="field-row"><input type="range" id="verdi" min="50000" max="3000000" step="50000" value="500000"><span class="val" id="verdi-val"></span></div>
+    </div>
+    <div class="field">
+      <label style="display:flex;justify-content:space-between;align-items:center;">
+        <span>Estimert restverdi om <span id="restverdi-ar">5</span> år</span>
+        <span style="font-size:9px;font-family:'IBM Plex Mono',monospace;color:#8a8078;background:#f0ece4;padding:2px 6px;border-radius:2px;">beregnet</span>
+      </label>
+      <div class="field-row" style="pointer-events:none;opacity:1;">
+        <div style="flex:1;position:relative;height:2px;background:var(--border);border-radius:2px;">
+          <div id="restverdi-bar" style="position:absolute;left:0;top:0;height:2px;background:#c7bdb0;border-radius:2px;width:60%;"></div>
+          <div id="restverdi-thumb" style="position:absolute;top:50%;transform:translate(-50%,-50%);width:13px;height:13px;background:#a89c8a;border-radius:50%;left:60%;"></div>
+        </div>
+        <span class="val" id="restverdi-val" style="color:var(--muted);"></span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Kjøpspris (historisk)</label>
+      <div class="field-row"><input type="range" id="kjopspris" min="50000" max="3000000" step="50000" value="500000"><span class="val" id="kjopspris-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Eksisterende billån</label>
+      <div class="field-row"><input type="range" id="lan" min="0" max="1000000" step="10000" value="150000"><span class="val" id="lan-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Rente billån (%)</label>
+      <div class="field-row"><input type="range" id="lanerente" min="2" max="15" step="0.1" value="7.5"><span class="val" id="lanerente-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Løpetid billån (år)</label>
+      <div class="field-row"><input type="range" id="lanlopetid" min="1" max="10" step="1" value="4"><span class="val" id="lanlopetid-val"></span></div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label">Formuesskatt</div>
+    <div class="field">
+      <label>Listepris som ny (for formuesberegning)</label>
+      <div class="field-row"><input type="range" id="listepris" min="50000" max="3000000" step="50000" value="500000"><span class="val" id="listepris-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Formuesskattesats (%)</label>
+      <div class="field-row"><input type="range" id="formuessats" min="0" max="1.5" step="0.05" value="1.0"><span class="val" id="formuessats-val"></span></div>
+    </div>
+    <div class="infobox warn">
+      ℹ Biler formuesverdsettes etter Skatteetatens skala: ny bil = 75% av listepris, faller hvert år (år 1: 65%, år 2: 55%, år 3: 45%, år 4: 40%, år 5: 30%, år 6: 20%, år 7+: 15%). Formuesverdien inngår i din samlede nettoformue og beskattes kun i den grad du er over bunnfradraget (1 760 000 kr i 2025).
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label">Verdifall over tid</div>
+    <div class="field">
+      <label>Verdifall år 1 — stort fall når bilen er ny (% av nåverdi) <span class="auto-badge">auto</span></label>
+      <div class="field-row"><input type="range" id="avskr1" min="3" max="35" step="0.5" value="15"><span class="val" id="avskr1-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Verdifall fra år 2 og utover (%/år) — flater ut med alder <span class="auto-badge">auto</span></label>
+      <div class="field-row"><input type="range" id="avskrN" min="2" max="20" step="0.5" value="10"><span class="val" id="avskrN-val"></span></div>
+    </div>
+    <div class="infobox">ℹ Bilen mister mest verdi de første årene — særlig år 1 (typisk 15–25%). Fra år 2 flater fallet ut. Satsene justeres automatisk etter alder og km/år. Du kan overstyre manuelt. Eierperioden bestemmer når du selger og hva sluttverdi er.</div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label">Kjøring — påvirker kostnader og verdifall</div>
+    <div class="field">
+      <label>Kjørelengde — eget bruk (km/år)</label>
+      <div class="field-row"><input type="range" id="kmaar" min="0" max="50000" step="1000" value="15000"><span class="val" id="kmaar-val"></span></div>
+    </div>
+    <div class="infobox warn" id="km-impact-info">ℹ Justeres automatisk i beregningene:</div>
+    <div class="field" id="field-drivstoff">
+      <label>Drivstoffpris (kr/liter)</label>
+      <div class="field-row"><input type="range" id="drivstoffpris" min="10" max="30" step="0.5" value="20"><span class="val" id="drivstoffpris-val"></span></div>
+    </div>
+    <div class="field" id="field-forbruk">
+      <label>Forbruk (liter / 100 km)</label>
+      <div class="field-row"><input type="range" id="forbruk" min="4" max="20" step="0.5" value="8"><span class="val" id="forbruk-val"></span></div>
+    </div>
+    <div class="field" id="field-ladepris" style="display:none;">
+      <label>Ladekostnad (kr / kWh)</label>
+      <div class="field-row"><input type="range" id="ladepris" min="1" max="8" step="0.25" value="2.5"><span class="val" id="ladepris-val"></span></div>
+    </div>
+    <div class="field" id="field-forbruk-kwh" style="display:none;">
+      <label>Forbruk (kWh / 100 km)</label>
+      <div class="field-row"><input type="range" id="forbrukKwh" min="10" max="30" step="0.5" value="20"><span class="val" id="forbrukKwh-val"></span></div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label">Faste eierkostnader</div>
+    <div class="field">
+      <label>Forsikring — ordinær/kasko (kr/år) <span class="auto-badge">auto</span></label>
+      <div class="field-row"><input type="range" id="forsOrdinær" min="2000" max="35000" step="500" value="8000"><span class="val" id="forsOrdinær-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Forsikring — med utleieforsikring (kr/år) <span class="auto-badge">auto</span></label>
+      <div class="field-row"><input type="range" id="forsUtleie" min="4000" max="55000" step="500" value="14000"><span class="val" id="forsUtleie-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Service / EU-kontroll / dekk (kr/år) <span class="auto-badge">auto</span></label>
+      <div class="field-row"><input type="range" id="service" min="2000" max="40000" step="500" value="8000"><span class="val" id="service-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Bilpleie / vask (kr/år)</label>
+      <div class="field-row"><input type="range" id="vask" min="0" max="20000" step="500" value="3000"><span class="val" id="vask-val"></span></div>
+    </div>
+    <div class="infobox green">ℹ Regelmessig vask og pleie er viktig for utleievurderinger og dagspris. Trekkes som driftskostnad.</div>
+    <div class="field" id="field-veibruk">
+      <label>Veibruksavgift / årsavgift (kr/år)</label>
+      <div class="field-row"><input type="range" id="veibruk" min="0" max="8000" step="100" value="3500"><span class="val" id="veibruk-val"></span></div>
+    </div>
+    <div class="field" id="field-elbilfordel" style="display:none;">
+      <label>Elbil-fordel (sparte avgifter mm, kr/år)</label>
+      <div class="field-row"><input type="range" id="elbilfordel" min="0" max="30000" step="500" value="8000"><span class="val" id="elbilfordel-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Parkering / bom — eier betaler (kr/år)</label>
+      <div class="field-row"><input type="range" id="parkering" min="0" max="30000" step="500" value="5000"><span class="val" id="parkering-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Slitasje ved utleie (kr/utleiedag ekstra)</label>
+      <div class="field-row"><input type="range" id="slitasje" min="0" max="500" step="10" value="80"><span class="val" id="slitasje-val"></span></div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label">Utleieinntekter</div>
+    <div class="field">
+      <label>Plattform</label>
+      <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;">
+        <button class="toggle-btn active" id="btn-nabobil" onclick="setPlattform('nabobil')">Nabobil (u/nøkkelboks)</button>
+        <button class="toggle-btn" id="btn-nabobil-box" onclick="setPlattform('nabobil-box')">Nabobil (m/nøkkelboks)</button>
+        <button class="toggle-btn" id="btn-hyre" onclick="setPlattform('hyre')">Hyre</button>
+        <button class="toggle-btn" id="btn-annen" onclick="setPlattform('annen')">Annen</button>
+      </div>
+    </div>
+    <div class="infobox" id="plattform-info">ℹ Nabobil u/nøkkelboks: 20% provisjon. Forsikring inkludert i provisjonen (If, opptil 1 mill kr). Bilen kan max være 15 år gammel.</div>
+    <div class="field">
+      <label>Dagspris ved utleie (kr/dag) <span class="auto-badge">auto</span></label>
+      <div class="field-row"><input type="range" id="dagspris" min="200" max="3000" step="50" value="700"><span class="val" id="dagspris-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Utleiedager per år</label>
+      <div class="field-row"><input type="range" id="utleiedager" min="5" max="200" step="5" value="60"><span class="val" id="utleiedager-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Plattformkutt (% av brutto) <span class="auto-badge" id="plattform-auto-badge">auto</span></label>
+      <div class="field-row"><input type="range" id="plattformkutt" min="5" max="50" step="1" value="20"><span class="val" id="plattformkutt-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Prisøkning utleie (%/år)</label>
+      <div class="field-row"><input type="range" id="prisvekstLeie" min="0" max="6" step="0.25" value="2.0"><span class="val" id="prisvekstLeie-val"></span></div>
+    </div>
+    <div class="infobox">
+      ℹ Skattefritak: inntil <strong style="color:var(--accent)">10 000 kr/år</strong> er skattefritt (2025-regler). Overskytende beskattes som kapitalinntekt (22%).<br>
+      Leietaker betaler drivstoff/lading selv.<br>
+      <span style="color:#8a8078;">NB: Brutto = pris leietaker betaler. Du mottar brutto minus plattformkutt.</span>
+    </div>
+  </div>
+
+  <div class="sidebar-section" id="alt-section" style="display:none;">
+    <div class="section-label">Alternative plasseringer (ved salg)</div>
+    <div class="field">
+      <label>Bankinnskudd (%)</label>
+      <div class="field-row"><input type="range" id="alt1" min="1" max="8" step="0.1" value="4.0"><span class="val" id="alt1-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Globalt indeksfond (%)</label>
+      <div class="field-row"><input type="range" id="alt2" min="3" max="12" step="0.25" value="7.0"><span class="val" id="alt2-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Oslo Børs / aksjer (%)</label>
+      <div class="field-row"><input type="range" id="alt3" min="3" max="15" step="0.25" value="8.0"><span class="val" id="alt3-val"></span></div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label">Skatt og inflasjon</div>
+    <div class="field">
+      <label>Skatt på leieinntekt over 10 000 kr (%)</label>
+      <div class="field-row"><input type="range" id="skatt" min="15" max="35" step="1" value="22"><span class="val" id="skatt-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Inflasjon — for realverdi-visning (%)</label>
+      <div class="field-row"><input type="range" id="inflasjon" min="0" max="6" step="0.25" value="2.5"><span class="val" id="inflasjon-val"></span></div>
+    </div>
+    <div class="infobox">ℹ Gevinst ved salg av privatbil er skattefri i Norge (ikke næringsinntekt).</div>
+  </div>
+
+</aside>
+<main class="main" id="results"></main>
+</div>
+
+<script>
+const fmt    = n => new Intl.NumberFormat('no-NO',{maximumFractionDigits:0}).format(Math.round(n))+' kr';
+const fmtM   = n => Math.abs(n)>=1e6?(n/1e6).toFixed(2)+' mill':fmt(n);
+const fmtPct = n => n.toFixed(1)+' %';
+
+let biltype='bensin', modus='egetbruk', visReal=false, chartInst=null;
+
+/* ---- Auto-defaults basert på alder ---- */
+// Referansekm der base-satser er kalibrert
+const KM_REF = 15000;
+
+function autoVals(alder, bt) {
+  const elbil = bt === 'elbil';
+  const km    = typeof get === 'function' ? get('kmaar') : KM_REF;
+
+  // ── Avskrivning: alder + km-justert ──
+  // Høy km-stand gir ekstra verdifall: +0.5% per 10 000 km over ref (begge satser)
+  const kmFaktor = Math.max(0, (km - KM_REF) / 10000) * 0.5;
+  const avskr1 = Math.round(Math.max(4,  (elbil ? 25 : 20) - alder * 1.1 + kmFaktor) * 2) / 2;
+  const avskrN = Math.round(Math.max(2.5,(elbil ? 14 : 12) - alder * 0.5 + kmFaktor * 0.6) * 2) / 2;
+
+  // ── Forsikring: alder + km-påslag ──
+  // Base (15 000 km). Over 15 000: +10% per 10 000 km ekstra (km-klasse-effekt)
+  const kmForsikringFaktor = 1 + Math.max(0, (km - KM_REF) / 10000) * 0.10;
+  const forsOrdinærBase = Math.max(3500, 14000 - alder * 700);
+  const forsOrdinær = Math.round(forsOrdinærBase * kmForsikringFaktor / 500) * 500;
+  const forsUtleieBase = Math.max(7000, 22000 - alder * 900);
+  const forsUtleie  = Math.round(forsUtleieBase  * kmForsikringFaktor / 500) * 500;
+
+  // ── Service / vedlikehold / dekk: alder + km ──
+  // Base ved ref-km. Over ref: 0.85 kr/km ekstra (dekk ~0.60 + service ~0.25)
+  // Elbil: lavere service (ingen olje etc.) men samme dekkslitasje → 0.65 kr/km
+  const serviceBase = Math.max(5000, 6000 + alder * 400);
+  const kmPrKm      = elbil ? 0.65 : 0.85;
+  const serviceKmTillegg = Math.max(0, km - KM_REF) * kmPrKm;
+  const service = Math.round((serviceBase + serviceKmTillegg) / 500) * 500;
+
+  // ── Dagspris utleie: alder (km ikke direkte relevant for leietaker) ──
+  const dagspris = Math.round(Math.max(350, 1100 - alder * 50) / 50) * 50;
+
+  return { avskr1, avskrN, forsOrdinær, forsUtleie, service, dagspris };
+}
+
+function setSlider(id,v){
+  const el=document.getElementById(id); if(!el)return;
+  el.value=v; displayVal(id,v);
+}
+
+function applyAuto(){
+  const a=get('alder'), d=autoVals(a,biltype);
+  Object.entries(d).forEach(([k,v])=>setSlider(k,v));
+
+  // Ny bil: markedsverdi = kjøpspris = listepris som ny
+  if (a === 0) {
+    const nypris = get('verdi');
+    setSlider('kjopspris', nypris);
+    setSlider('listepris',  nypris);
+  }
+
+  renderChips(a);
+  updateKmInfo();
+  // Visual hint: tell user kjøpspris og listepris er låst til markedsverdi ved alder=0
+  const nyHint = a === 0 ? ' <span style="color:var(--green);font-size:9px;font-family:IBM Plex Mono,monospace;">= markedsverdi (ny bil)</span>' : '';
+  const lkp = document.querySelector('label[for="kjopspris"], #field-kjopspris label');
+  const llp = document.querySelector('label[for="listepris"], #field-listepris label');
+  // Update val display color to signal locked state
+  ['kjopspris','listepris'].forEach(id=>{
+    const el=document.getElementById(id+'-val');
+    if(el) el.style.color = a===0 ? 'var(--green)' : 'var(--accent)';
+  });
+}
+
+function renderChips(a){
+  const el=document.getElementById('alder-chips'); if(!el)return;
+  const cats=[{l:'Ny',min:0,max:0},{l:'1–2 år',min:1,max:2},{l:'3–5 år',min:3,max:5},{l:'6–9 år',min:6,max:9},{l:'10+ år',min:10,max:99}];
+  el.innerHTML=cats.map(c=>`<div class="chip${a>=c.min&&a<=c.max?' on':''}">${c.l}</div>`).join('');
+}
+
+/* ---- Modus / biltype ---- */
+function setModus(m){
+  modus=m;
+  document.getElementById('btn-inv').classList.toggle('active',m==='investering');
+  document.getElementById('btn-eget').classList.toggle('active',m==='egetbruk');
+  document.getElementById('alt-section').style.display=m==='investering'?'':'none';
+  document.getElementById('modus-info').textContent=m==='investering'
+    ?'ℹ Investering: sammenligner utleie hele perioden mot selge nå og plassere kapitalen i fond/bank.'
+    :'ℹ Eget bruk: bilen beholdes uansett. Analysen viser om det lønner seg å leie ut når den ellers ville stått.';
+  calculate();
+}
+function setBiltype(bt){
+  biltype=bt;
+  document.getElementById('btn-bensin').classList.toggle('active',bt==='bensin');
+  document.getElementById('btn-elbil').classList.toggle('active',bt==='elbil');
+  document.getElementById('field-veibruk').style.opacity=bt==='elbil'?'0.35':'1';
+  document.getElementById('field-elbilfordel').style.display=bt==='elbil'?'':'none';
+  document.getElementById('field-drivstoff').style.display=bt==='elbil'?'none':'';
+  document.getElementById('field-forbruk').style.display=bt==='elbil'?'none':'';
+  document.getElementById('field-ladepris').style.display=bt==='elbil'?'':'none';
+  document.getElementById('field-forbruk-kwh').style.display=bt==='elbil'?'':'none';
+
+  applyAuto(); updateKmInfo(); calculate();
+}
+function updateKmInfo() {
+  const km   = get('kmaar');
+  const alder = get('alder');
+  const bt   = biltype;
+  const elbil = bt === 'elbil';
+  const kmPrKm = elbil ? 0.65 : 0.85;
+  const extraKm = Math.max(0, km - KM_REF);
+  const extraService = Math.round(extraKm * kmPrKm / 500) * 500;
+  const kmFaktor = Math.max(0, (km - KM_REF) / 10000);
+  const extraFors   = Math.round((Math.max(3500, 14000 - alder * 700)) * kmFaktor * 0.10 / 500) * 500;
+  const avskrExtra  = (kmFaktor * 0.5).toFixed(1);
+
+  const el = document.getElementById('km-impact-info');
+  if (!el) return;
+  if (extraKm === 0) {
+    el.textContent = 'ℹ Ved 15 000 km/år: basisverdier for service, forsikring og verdifall.';
+  } else {
+    el.textContent = `ℹ ${km.toLocaleString('no-NO')} km/år vs 15 000 ref: `
+      + `service/dekk +${new Intl.NumberFormat('no-NO').format(extraService)} kr/år · `
+      + `forsikring +${new Intl.NumberFormat('no-NO').format(extraFors)} kr/år · `
+      + `verdifall +${avskrExtra}%/år`;
+  }
+}
+
+const PLATTFORMER = {
+  'nabobil':     { kutt: 20, info: 'ℹ Nabobil u/nøkkelboks: 20% provisjon. Forsikring inkludert (If, opptil 1 mill). Bilen max 15 år.' },
+  'nabobil-box': { kutt: 25, info: 'ℹ Nabobil m/nøkkelboks: 25% provisjon. Nøkkelfri overlevering.' },
+  'hyre':        { kutt: 30, info: 'ℹ Hyre: ca. 30% provisjon (estimat). Primært flåteutleie.' },
+  'annen':       { kutt: 25, info: 'ℹ Annen plattform — juster plattformkutt manuelt.' },
+};
+function setPlattform(p) {
+  ['nabobil','nabobil-box','hyre','annen'].forEach(b => document.getElementById('btn-'+b).classList.toggle('active', b===p));
+  const pl = PLATTFORMER[p];
+  setSlider('plattformkutt', pl.kutt);
+  document.getElementById('plattform-info').textContent = pl.info;
+  calculate();
+}
+function setReal(v){
+  visReal=v;
+  document.getElementById('btn-nom').classList.toggle('active',!v);
+  document.getElementById('btn-real').classList.toggle('active',v);
+  calculate();
+}
+
+/* ---- Sliders ---- */
+const SLIDERS=[
+  'alder','horisont','verdi','kjopspris','lan','lanerente','lanlopetid','listepris','formuessats',
+  'avskr1','avskrN','forsOrdinær','forsUtleie','service','vask',
+  'veibruk','elbilfordel','parkering','slitasje',
+  'dagspris','utleiedager','plattformkutt','prisvekstLeie',
+  'kmaar','drivstoffpris','forbruk','ladepris','forbrukKwh',
+  'alt1','alt2','alt3','skatt','inflasjon'
+];
+function displayVal(id,v){
+  const el=document.getElementById(id+'-val'); if(!el)return;
+  const map={
+    alder:v==0?'Ny bil':v+' år gammel', horisont:v+' år',
+    verdi:fmtM(v), kjopspris:fmtM(v), lan:fmtM(v),
+    lanerente:fmtPct(v), lanlopetid:v+' år',
+    avskr1:fmtPct(v), avskrN:fmtPct(v),
+    forsOrdinær:fmt(v)+'/år', forsUtleie:fmt(v)+'/år',
+    service:fmt(v)+'/år', vask:fmt(v)+'/år',
+    veibruk:fmt(v)+'/år', elbilfordel:fmt(v)+'/år',
+    parkering:fmt(v)+'/år', slitasje:fmt(v)+'/dag',
+    dagspris:fmt(v)+'/dag', utleiedager:v+' dager/år',
+    plattformkutt:fmtPct(v), prisvekstLeie:fmtPct(v),
+    alt1:fmtPct(v), alt2:fmtPct(v), alt3:fmtPct(v),
+    skatt:fmtPct(v), inflasjon:fmtPct(v),
+    listepris:fmtM(v), formuessats:fmtPct(v),
+    kmaar:new Intl.NumberFormat('no-NO').format(v)+' km/år', drivstoffpris:v.toFixed(1)+' kr/l', forbruk:v.toFixed(1)+' l/100km', ladepris:v.toFixed(2)+' kr/kWh', forbrukKwh:v.toFixed(1)+' kWh/100km',
+  };
+  el.textContent=map[id]!==undefined?map[id]:v;
+}
+function get(id){return parseFloat(document.getElementById(id).value);}
+
+/* ---- Finance helpers ---- */
+function bilverdi(V0,a1,aN,y){
+  if(y<=0)return V0;
+  let v=V0*(1-a1/100);
+  for(let i=2;i<=y;i++)v*=(1-aN/100);
+  return Math.max(0,v);
+}
+function termÅr(lan,rente,lopetid){
+  if(lan<=0||lopetid<=0)return 0;
+  const r=rente/100/12, n=lopetid*12;
+  if(r===0)return lan/lopetid;
+  return (lan*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1))*12;
+}
+function defl(v,y){return visReal?v/Math.pow(1+get('inflasjon')/100,y):v;}
+
+/* ---- Formuesverdi bil etter Skatteetatens skala ---- */
+function formuesverdi(listepris, alderVedKjøp, arEtter) {
+  // alder = bilens alder ved inngangen til år y
+  const alder = alderVedKjøp + arEtter;
+  const skala = [0.75, 0.65, 0.55, 0.45, 0.40, 0.30, 0.20];
+  const pst = alder < skala.length ? skala[alder] : 0.15;
+  return listepris * pst;
+}
+
+/* ---- Drivstoff / ladekostnad per år ---- */
+function drivstoffKrÅr(p) {
+  if (biltype === 'elbil') {
+    return p.kmaar * (p.forbrukKwh / 100) * p.ladepris;
+  } else {
+    return p.kmaar * (p.forbruk / 100) * p.drivstoffpris;
+  }
+}
+
+/* ---- Simulering ---- */
+function simLeie(dagsprisSats, p){
+  const GRENSE=10000;
+  const term=termÅr(p.lan,p.lanerente,p.lanlopetid);
+  let restLan=p.lan, akkKf=0;
+  const kfArr=[], lanArr=[p.lan];
+  for(let y=1;y<=p.ar;y++){
+    const renteY=restLan*p.lanerente/100;
+    const avdragY=Math.max(0,term-renteY);
+    restLan=Math.max(0,restLan-avdragY);
+    lanArr.push(restLan);
+    const dagsY=dagsprisSats*Math.pow(1+p.prisvekstLeie/100,y-1);
+    const bruttoY=dagsY*p.utleiedager;
+    const etterPlatY=bruttoY*(1-p.plattformkutt/100);
+    const skattY=Math.max(0,etterPlatY-GRENSE)*p.skattPct/100;
+    const nettoLeieY=etterPlatY-skattY;
+    const veibrukY=biltype==='elbil'?0:p.veibruk;
+    const elbilY=biltype==='elbil'?p.elbilfordel:0;
+    const fmVerdiY=formuesverdi(p.listepris, get('alder'), y);
+    const formuesskattkrY=fmVerdiY * p.formuessats;
+    const drivstoffY=drivstoffKrÅr(p);
+    const kf=nettoLeieY-avdragY-p.forsUtleie-p.service-p.vask-veibrukY+elbilY-p.parkering-p.slitasje*p.utleiedager-formuesskattkrY-drivstoffY;
+    akkKf+=kf; kfArr.push(kf);
+  }
+  const VN=bilverdi(p.V0,p.avskr1,p.avskrN,p.ar);
+  return{total:akkKf+VN-restLan, kfArr, lanArr, VN, akkKf, lanSlutt:restLan};
+}
+
+function simBeholde(p){
+  const term=termÅr(p.lan,p.lanerente,p.lanlopetid);
+  let restLan=p.lan, akkKf=0;
+  const kfArr=[], lanArr=[p.lan];
+  for(let y=1;y<=p.ar;y++){
+    const renteY=restLan*p.lanerente/100;
+    const avdragY=Math.max(0,term-renteY);
+    restLan=Math.max(0,restLan-avdragY);
+    lanArr.push(restLan);
+    const veibrukY=biltype==='elbil'?0:p.veibruk;
+    const elbilY=biltype==='elbil'?p.elbilfordel:0;
+    const fmVerdiYb=formuesverdi(p.listepris, get('alder'), y);
+    const formuesskattkrYb=fmVerdiYb * p.formuessats;
+    const drivstoffYb=drivstoffKrÅr(p);
+    const kf=-(avdragY+p.forsOrdinær+p.service+p.vask+veibrukY-elbilY+p.parkering+formuesskattkrYb+drivstoffYb);
+    akkKf+=kf; kfArr.push(kf);
+  }
+  const VN=bilverdi(p.V0,p.avskr1,p.avskrN,p.ar);
+  return{total:akkKf+VN-restLan, kfArr, lanArr, VN, akkKf, lanSlutt:restLan};
+}
+
+function biseksjonDager(ref,sats,p){
+  const mal=ref*1.10;
+  let lo=0,hi=365;
+  for(let i=0;i<64;i++){
+    const mid=(lo+hi)/2;
+    if(simLeie(sats,{...p,utleiedager:mid}).total<mal)lo=mid;
+    else hi=mid;
+  }
+  return Math.round((lo+hi)/2);
+}
+
+/* ---- Calculate ---- */
+function updateRestverdi() {
+  const V0  = get('verdi');
+  const ar  = get('horisont');
+  const rv  = bilverdi(V0, get('avskr1'), get('avskrN'), ar);
+  const pst = V0 > 0 ? rv / V0 : 0;
+
+  const elVal   = document.getElementById('restverdi-val');
+  const elAr    = document.getElementById('restverdi-ar');
+  const elBar   = document.getElementById('restverdi-bar');
+  const elThumb = document.getElementById('restverdi-thumb');
+  if (!elVal) return;
+
+  elVal.textContent   = fmtM(rv) + ' (' + Math.round(pst * 100) + '% av nå)';
+  if (elAr) elAr.textContent = ar;
+  const w = Math.round(pst * 100) + '%';
+  if (elBar)   elBar.style.width = w;
+  if (elThumb) elThumb.style.left = w;
+}
+
+function calculate(){
+  const p={
+    V0:get('verdi'), lan:get('lan'), lanerente:get('lanerente'), lanlopetid:get('lanlopetid'),
+    avskr1:get('avskr1'), avskrN:get('avskrN'),
+    forsOrdinær:get('forsOrdinær'), forsUtleie:get('forsUtleie'),
+    service:get('service'), vask:get('vask'), veibruk:get('veibruk'),
+    elbilfordel:get('elbilfordel'), parkering:get('parkering'), slitasje:get('slitasje'),
+    utleiedager:get('utleiedager'), plattformkutt:get('plattformkutt'),
+    prisvekstLeie:get('prisvekstLeie'), skattPct:get('skatt'), ar:get('horisont'),
+    listepris:get('listepris'), formuessats:get('formuessats')/100,
+    kmaar:get('kmaar'), drivstoffpris:get('drivstoffpris'), forbruk:get('forbruk'), ladepris:get('ladepris'), forbrukKwh:get('forbrukKwh'),
+  };
+  const ar=p.ar, dagspris=get('dagspris'), alder=get('alder');
+
+  const sL=simLeie(dagspris,p);
+  const sB=simBeholde(p);
+
+  /* Alternativ plassering */
+  const friKap=p.V0-p.lan;
+  const SR=0.22, SA=0.22, SAK=0.22*1.72;
+  const a1=get('alt1')/100, a2=get('alt2')/100, a3=get('alt3')/100;
+  const v1=friKap*Math.pow(1+a1*(1-SR),ar);
+  const v2b=friKap*Math.pow(1+a2,ar); const v2=v2b-Math.max(0,v2b-friKap)*SA;
+  const v3b=friKap*Math.pow(1+a3,ar); const v3=v3b-Math.max(0,v3b-friKap)*SAK;
+  const besteAlt=Math.max(v1,v2,v3);
+
+  /* År 1 detaljer */
+  const GRENSE=10000;
+  const bruttoÅr1=dagspris*p.utleiedager;
+  const etterPlat1=bruttoÅr1*(1-p.plattformkutt/100);
+  const skattÅr1=Math.max(0,etterPlat1-GRENSE)*p.skattPct/100;
+  const slitasjeÅr1=p.slitasje*p.utleiedager;
+  const term=termÅr(p.lan,p.lanerente,p.lanlopetid);
+  const renteÅr1=p.lan*p.lanerente/100;
+  const avdragÅr1=Math.max(0,term-renteÅr1);
+  const veibrukV=biltype==='elbil'?0:p.veibruk;
+  const elbilV=biltype==='elbil'?p.elbilfordel:0;
+  const kf1=sL.kfArr[0]||0;
+  const verditapÅr1=p.V0-bilverdi(p.V0,p.avskr1,p.avskrN,1);
+  const verdiSlutt=bilverdi(p.V0,p.avskr1,p.avskrN,ar);
+  const merverdi=sL.total-sB.total;
+
+  /* Verdict */
+  let vClass,vFarge,vTittel,vSub;
+  if(modus==='egetbruk'){
+    vClass =merverdi>0?'leie':'beholde';
+    vFarge =merverdi>0?'green':'blue';
+    vTittel=Math.abs(merverdi)<30000?'≈ Omtrent likt':(merverdi>0?'Lønnsomt å leie ut':'La den stå — ikke lønnsomt');
+    vSub=`Merverdi av utleie vs. å la bilen stå: <strong>${fmt(Math.abs(merverdi))}</strong>`;
+  } else {
+    const diff=sL.total-besteAlt;
+    vClass =diff>0?'leie':'selge';
+    vFarge =diff>0?'green':'red';
+    vTittel=Math.abs(diff)<50000?'≈ Tilnærmet likt':(diff>0?'Leie ut anbefales':'Selge + investere anbefales');
+    vSub=`Differanse mot beste alternativ: <strong>${fmt(Math.abs(diff))}</strong>`;
+  }
+
+  const realLabel=visReal?` (real, ${fmtPct(get('inflasjon'))} inflasjon)`:'';
+
+  /* Måldager */
+  const mdRef=modus==='egetbruk'?sB.total:besteAlt;
+  const mdLabel=modus==='egetbruk'?'Beholde uten utleie':'Beste alternativ (invester salgsproveny)';
+  const md=biseksjonDager(mdRef,dagspris,p);
+
+  /* Sensitivitet */
+  const base=sL.total;
+  const sens=[
+    {n:'Utleiedager',       r:'+', fn:q=>simLeie(dagspris,{...q,utleiedager:q.utleiedager*1.1}).total-base},
+    {n:'Dagspris',          r:'+', fn:q=>simLeie(dagspris*1.1,q).total-base},
+    {n:'Verdifall (avskr.)',r:'−', fn:q=>simLeie(dagspris,{...q,avskr1:q.avskr1*1.1,avskrN:q.avskrN*1.1}).total-base},
+    {n:'Forsikring utleie', r:'−', fn:q=>simLeie(dagspris,{...q,forsUtleie:q.forsUtleie*1.1}).total-base},
+    {n:'Slitasje/dag',      r:'−', fn:q=>simLeie(dagspris,{...q,slitasje:q.slitasje*1.1}).total-base},
+    {n:'Plattformkutt',     r:'−', fn:q=>simLeie(dagspris,{...q,plattformkutt:q.plattformkutt*1.1}).total-base},
+    {n:'Bilpleie / vask',   r:'−', fn:q=>simLeie(dagspris,{...q,vask:q.vask*1.1}).total-base},
+    {n:'Km/år (eget bruk)', r:'−', fn:q=>simLeie(dagspris,{...q,kmaar:q.kmaar*1.1}).total-base},
+  ].map(t=>({...t,p:t.fn(p)})).sort((a,b)=>Math.abs(b.p)-Math.abs(a.p));
+  const maxS=Math.max(...sens.map(s=>Math.abs(s.p)));
+
+  const html=`
+  <div class="rt-wrap">
+    <span class="rt-label">Visning:</span>
+    <div style="display:flex;gap:6px;">
+      <button class="toggle-btn ${!visReal?'active':''}" id="btn-nom" onclick="setReal(false)">Nominell</button>
+      <button class="toggle-btn ${visReal?'active':''}" id="btn-real" onclick="setReal(true)">Real</button>
+    </div>
+    <span class="badge ${modus==='investering'?'inv':'eget'}">${modus==='investering'?'Investering':'Eget bruk'}</span>
+    ${biltype==='elbil'?'<span class="badge elbil">Elbil</span>':''}
+    ${alder===0?'<span class="badge" style="background:#1a1008;border-color:var(--orange);color:var(--orange);">Ny bil</span>':''}
+  </div>
+
+  <div class="verdict ${vClass}">
+    <div class="verdict-label">${modus==='egetbruk'?'Eget bruk — lønner det seg å leie ut?':'Investering'} · ${ar} år · ${alder===0?'Ny bil':alder+' år gammel'}</div>
+    <div class="verdict-title ${vFarge}">${vTittel}</div>
+    <div class="verdict-sub">
+      ${vSub}
+      ${kf1<0?'<br>⚠ Negativ kontantflyt år 1 — bilen koster mer enn den inntjener.':''}
+      <br><span style="color:#8a8078;font-size:12px;font-family:'IBM Plex Mono',monospace;display:block;margin-top:6px;">
+        Leie ut: ${fmtM(defl(sL.total,ar))} &nbsp;·&nbsp; Beholde: ${fmtM(defl(sB.total,ar))}
+        ${modus==='investering'?` &nbsp;·&nbsp; Selge+investere: ${fmtM(defl(besteAlt,ar))}`:''}  
+      </span>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-label">Kontantflyt år 1 — utleie</div>
+      <div class="card-value ${kf1>=0?'green':'red'}">${fmt(kf1)}</div>
+      <div class="card-sub">${fmt(kf1/12)} / mnd snitt</div>
+    </div>
+    <div class="card">
+      <div class="card-label">${modus==='egetbruk'?'Merverdi av utleie':'Fri kapital ved salg nå'}</div>
+      <div class="card-value ${modus==='egetbruk'?(merverdi>=0?'green':'red'):''}">${modus==='egetbruk'?fmtM(merverdi):fmtM(friKap)}</div>
+      <div class="card-sub">${modus==='egetbruk'?'vs. la bilen stå i '+(ar)+' år':'Etter billån (ingen gevinstskatt)'}</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Verditap år 1</div>
+      <div class="card-value red">${fmtM(verditapÅr1)}</div>
+      <div class="card-sub">${fmtPct((verditapÅr1/p.V0)*100)} av nåverdi</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Bilverdi om ${ar} år</div>
+      <div class="card-value blue">${fmtM(verdiSlutt)}</div>
+      <div class="card-sub">${fmtPct((verdiSlutt/p.V0)*100)} av nåverdi</div>
+    </div>
+  </div>
+
+  <div class="breakdown">
+    <div class="breakdown-header">Verdifall over eierperioden — ${ar} år</div>
+    <table>
+      <tr style="color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:10px;">
+        <td style="padding:8px 18px;">År</td>
+        <td>Alder på bil</td>
+        <td>Estimert markedsverdi</td>
+        <td>Verdifall dette året</td>
+        <td>Samlet tap fra nå</td>
+      </tr>
+      ${Array.from({length:ar}, (_,i)=>i+1).map(y=>{
+        const Vy = bilverdi(p.V0,p.avskr1,p.avskrN,y);
+        const Vprev = bilverdi(p.V0,p.avskr1,p.avskrN,y-1);
+        const tapAar = Vprev - Vy;
+        const tapTot = p.V0 - Vy;
+        const isLast = y===ar;
+        return `<tr ${isLast?'class="total"':''}>
+          <td>${y}</td>
+          <td>${get('alder')+y} år</td>
+          <td>${fmtM(Vy)}</td>
+          <td class="neg">− ${fmtM(tapAar)} (${fmtPct(tapAar/Vprev*100)})</td>
+          <td class="neg">− ${fmtM(tapTot)} (${fmtPct(tapTot/p.V0*100)})</td>
+        </tr>`;
+      }).join('')}
+    </table>
+    <div style="padding:10px 18px;font-size:11px;color:#8a8078;font-family:'IBM Plex Mono',monospace;border-top:1px solid #e0d9ce;">
+      Verdifall år 1: ${fmtPct(p.avskr1)}. År 2+: ${fmtPct(p.avskrN)}/år. Høy km-stand øker fallet. Eierperiode = ${ar} år → salg ved alder ${get('alder')+ar} år.
+    </div>
+  </div>
+
+  <div class="breakdown">
+    <div class="breakdown-header">Totalresultat over ${ar} år${realLabel}</div>
+    <table>
+      <tr><td><strong>Leie ut</strong><br><span style="font-size:11px;color:#8a8078;">Netto leieinntekt + sluttverdi − alle kostnader</span></td><td class="${sL.total>=sB.total?'pos':''}">${fmtM(defl(sL.total,ar))}</td></tr>
+      <tr><td><strong>Beholde uten utleie</strong><br><span style="font-size:11px;color:#8a8078;">Sluttverdi − eierkostnader − avdrag</span></td><td>${fmtM(defl(sB.total,ar))}</td></tr>
+      <tr style="border-top:1px solid var(--accent);">
+        <td style="font-size:14px;font-weight:500;color:var(--accent);">
+          Vinning av å leie ut
+          <br><span style="font-size:11px;font-weight:400;color:#8a8078;font-family:'IBM Plex Mono',monospace;">
+            over ${ar} år · ${fmt(Math.abs(defl(merverdi,ar)/ar))}/år snitt
+          </span>
+        </td>
+        <td style="font-size:18px;font-weight:700;font-family:'Playfair Display',serif;color:${merverdi>=0?'var(--green)':'var(--red)'};">
+          ${merverdi>=0?'+':''}${fmtM(defl(merverdi,ar))}
+        </td>
+      </tr>
+      ${modus==='investering'?`
+      <tr style="border-top:1px solid #e0d9ce;"><td>Selge nå → bankinnskudd (${fmtPct(get('alt1'))})</td><td class="${sL.total>v1?'pos':'neg'}">${fmtM(defl(v1,ar))}</td></tr>
+      <tr><td>Selge nå → indeksfond ASK (${fmtPct(get('alt2'))})</td><td class="${sL.total>v2?'pos':'neg'}">${fmtM(defl(v2,ar))}</td></tr>
+      <tr><td>Selge nå → Oslo Børs (${fmtPct(get('alt3'))})</td><td class="${sL.total>v3?'pos':'neg'}">${fmtM(defl(v3,ar))}</td></tr>
+      <tr><td style="padding:6px 18px;font-size:11px;color:#8a8078;" colspan="2">Gevinst privatbil er skattefri. Bank: 22% løpende. ASK: 22% gevinst. Aksjer: 37,84%.</td></tr>`:''}
+    </table>
+  </div>
+
+  <div class="breakdown">
+    <div class="breakdown-header">År 1 — Kontantflyt ved utleie (detaljert)</div>
+    <table>
+      <tr><td>Brutto leieinntekt (${p.utleiedager} dager × ${fmt(dagspris)}/dag)</td><td class="pos">+ ${fmt(bruttoÅr1)}</td></tr>
+      <tr><td>Plattformkutt (${fmtPct(p.plattformkutt)} av ${fmt(bruttoÅr1)})</td><td class="neg">− ${fmt(bruttoÅr1-etterPlat1)}</td></tr>
+      <tr><td style="padding-left:26px;color:#8a8078;font-size:12px">→ Du mottar etter kutt</td><td style="color:#8a8078;font-size:11px;text-align:right">${fmt(etterPlat1)}</td></tr>
+      <tr><td style="padding-left:26px;color:#8a8078;font-size:12px">→ Skattefri grense trekkes (10 000 kr)</td><td style="color:#8a8078;font-size:11px;text-align:right">− ${fmt(Math.min(GRENSE,etterPlat1))}</td></tr>
+      <tr><td>Skatt ${fmtPct(p.skattPct)} av skattepliktig del</td><td class="neg">− ${fmt(skattÅr1)}</td></tr>
+      <tr><td>Forsikring utleieforsikring <span style="color:#8a8078;font-size:11px">(km-justert)</span></td><td class="neg">− ${fmt(p.forsUtleie)}</td></tr>
+      <tr><td>Service / EU-kontroll / dekk <span style="color:#8a8078;font-size:11px">(inkl. km-justert dekkslitasje)</span></td><td class="neg">− ${fmt(p.service)}</td></tr>
+      <tr><td style="padding-left:26px;color:#8a8078;font-size:12px">→ ${p.kmaar.toLocaleString('no-NO')} km/år · ${p.kmaar>KM_REF?'+'+new Intl.NumberFormat('no-NO').format(Math.round(Math.max(0,p.kmaar-KM_REF)*( biltype==='elbil'?0.65:0.85)/500)*500)+' kr vs 15 000 km':'ved referansekm 15 000'}</td><td></td></tr>
+      <tr><td>Bilpleie / vask</td><td class="neg">− ${fmt(p.vask)}</td></tr>
+      ${biltype==='bensin'?`<tr><td>Veibruksavgift</td><td class="neg">− ${fmt(p.veibruk)}</td></tr>`:''}
+      ${biltype==='elbil'?`<tr><td>Elbil-fordel</td><td class="pos">+ ${fmt(p.elbilfordel)}</td></tr>`:''}
+      <tr><td>Parkering / bom</td><td class="neg">− ${fmt(p.parkering)}</td></tr>
+      <tr><td>Slitasje (${p.utleiedager} dager × ${fmt(p.slitasje)}/dag)</td><td class="neg">− ${fmt(slitasjeÅr1)}</td></tr>
+      <tr><td>Formuesskatt — bil (${fmtPct(get('formuessats'))} av ${fmtM(formuesverdi(get('listepris'),get('alder'),1))} formuesverdi)</td><td class="neg">− ${fmt(formuesverdi(get('listepris'),get('alder'),1) * get('formuessats')/100)}</td></tr>
+      <tr><td>${biltype==='elbil'?'Ladekostnad eget bruk':'Drivstoff eget bruk'} (${p.kmaar.toLocaleString('no-NO')} km × ${biltype==='elbil'?(p.forbrukKwh.toFixed(1)+' kWh/100km × '+p.ladepris.toFixed(2)+' kr/kWh'):(p.forbruk.toFixed(1)+' l/100km × '+p.drivstoffpris.toFixed(1)+' kr/l')})</td><td class="neg">− ${fmt(drivstoffKrÅr(p))}</td></tr>
+      <tr><td>Avdrag billån år 1 <span style="color:#8a8078;font-size:11px">(nedbetaler gjeld)</span></td><td class="neg">− ${fmt(avdragÅr1)}</td></tr>
+      <tr class="subtotal"><td>Netto kontantflyt år 1</td><td class="${kf1>=0?'pos':'neg'}">${fmt(kf1)}</td></tr>
+      <tr><td>Akkumulert kontantflyt × ${ar} år</td><td>${fmt(sL.akkKf)}</td></tr>
+      <tr><td>Bilverdi om ${ar} år</td><td>${fmtM(sL.VN)}</td></tr>
+      <tr><td>Gjenstående lån om ${ar} år</td><td class="neg">− ${fmtM(sL.lanSlutt)}</td></tr>
+      <tr class="total"><td>Total formue — leie ut (nominelt)</td><td>${fmtM(sL.total)}</td></tr>
+    </table>
+  </div>
+
+  <div class="cards" style="margin-top:-10px;">
+    <div class="card">
+      <div class="card-label">${biltype==='elbil'?'Ladekostnad / år':'Drivstoffkostnad / år'}</div>
+      <div class="card-value" style="font-size:18px;">${fmt(drivstoffKrÅr(p))}</div>
+      <div class="card-sub">${p.kmaar.toLocaleString('no-NO')} km · ${biltype==='elbil'?(p.forbrukKwh.toFixed(1)+' kWh/100km'):(p.forbruk.toFixed(1)+' l/100km')}</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Kontantutgang år 1</div>
+      ${(()=>{
+        const renteÅr1   = p.lan * p.lanerente / 100;
+        const renteFradrag = renteÅr1 * 0.22;
+        const avdragÅr1  = Math.max(0, termÅr(p.lan, p.lanerente, p.lanlopetid) - renteÅr1);
+        const drifts     = p.forsOrdinær + p.service + p.vask
+          + (biltype==='elbil'?0:p.veibruk) - (biltype==='elbil'?p.elbilfordel:0)
+          + p.parkering + drivstoffKrÅr(p)
+          + formuesverdi(p.listepris,get('alder'),1)*p.formuessats;
+        const lånUtgang  = renteÅr1 + avdragÅr1 - renteFradrag;
+        const total      = drifts + lånUtgang;
+        return '<div class="card-value red" style="font-size:18px;">− ' + fmtM(total) + '</div>'
+          + '<div class="card-sub" style="line-height:1.7;">'
+          + 'Renter: ' + fmt(renteÅr1) + ' − skattefradrag: ' + fmt(renteFradrag) + '<br>'
+          + 'Avdrag: ' + fmt(avdragÅr1) + ' <span style="color:#8a8078">(tilbake ved salg)</span><br>'
+          + 'Drift: ' + fmt(drifts)
+          + '</div>';
+      })()}
+    </div>
+  </div>
+
+  <div class="chart-wrap">
+    <div class="chart-title">Formuesutvikling over ${ar} år${realLabel}</div>
+    <canvas id="myChart" height="240"></canvas>
+  </div>
+
+  ${(()=>{
+    if (modus !== 'investering') return '';
+    const alts = [
+      {n:'Bankinnskudd',    v:v1, i:fmtPct(get('alt1'))+' · 22% løpende'},
+      {n:'Indeksfond ASK',  v:v2, i:fmtPct(get('alt2'))+' · 22% på gevinst'},
+      {n:'Oslo Børs',       v:v3, i:fmtPct(get('alt3'))+' · 37,84% på gevinst'},
+    ];
+    const altRows = alts.map(a => {
+      const mda = biseksjonDager(a.v, dagspris, p);
+      return '<div class="md-row" style="border-color:#e0d9ce;">'
+        + '<div><div class="md-name" style="color:var(--muted)">'+a.n+'</div><div class="md-info">'+a.i+'</div></div>'
+        + '<div style="text-align:right;"><div class="md-val" style="font-size:16px;color:var(--blue)">'+mda+'<span> dager/år</span></div>'
+        + '<div class="md-sub">'+(mda<=p.utleiedager?'✓ tilstrekkelig':mda-p.utleiedager+' dager mer')+'</div></div>'
+        + '</div>';
+    }).join('');
+    const mdOk = md<=p.utleiedager?'✓ Nåværende utleienivå er tilstrekkelig':md-p.utleiedager+' dager mer · '+(md<=100?'✓ realistisk':md<=150?'△ krevende':'⚠ svært høyt');
+    return '<div class="md-wrap">'
+      + '<div class="md-header">Lønnsom utleie — minimum dager for å slå salgsalternativet</div>'
+      + '<div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5;">Antall dager/år (til '+fmt(dagspris)+'/dag) for å gi <strong>10% bedre</strong> totalresultat enn å selge nå og investere, over '+ar+' år.</div>'
+      + '<div class="md-row"><div><div class="md-name">'+mdLabel+'</div><div class="md-info">Referanse: '+fmtM(defl(mdRef,ar))+realLabel+'</div></div>'
+      + '<div style="text-align:right;"><div class="md-val">'+md+'<span> dager/år</span></div><div class="md-sub">'+mdOk+'</div></div></div>'
+      + altRows
+      + '</div>';
+  })()}
+
+  <div class="sens-wrap">
+    <div class="sens-header">Hva betyr mest for lønnsomheten av utleie?</div>
+    <div class="sens-intro">
+      Viser hva som gir størst utslag på <strong>totalt utleieresultat over hele eierperioden (${ar} år)</strong> hvis én parameter endres med 10%.
+      Ikke et bilde av én enkelt dag eller ett år — men hva som teller mest over tid.
+    </div>
+    ${sens.map((s,i)=>{
+      const pos=s.p>=0;
+      const w=maxS>0?Math.min(100,Math.abs(s.p)/maxS*100):0;
+      return `<div class="sens-row">
+        <div class="sens-rank">${i+1}</div>
+        <div><div class="sens-name">${s.n} <span class="sens-ret">${s.r} 10% → ${pos?'bedre resultat':'dårligere resultat'}</span></div>
+        <div class="sens-bar-wrap"><div class="sens-bar ${pos?'pos':'neg'}" style="width:${w}%"></div></div></div>
+        <div class="sens-val ${pos?'pos':'neg'}">${pos?'+':''}${fmtM(s.p)}</div>
+      </div>`;
+    }).join('')}
+  </div>
+
+  <div class="note">
+    ⚠ Avdrag nedbetaler gjeld — ikke et tap. Avskrivning, forsikring, service og dagspris justeres automatisk etter bilens alder — kan overstyres.
+    Gevinst ved salg av privatbil er skattefri (ikke næring). 10 000 kr/år utleieinntekt er skattefritt (Skatteetaten 2025).
+    ${biltype==='elbil'?'Elbil: veibruksavgift = 0. ':`Bensin/diesel: ordinær veibruksavgift inkludert. `}
+    Formuesverdi bil (Skatteetatens skala): år 0=75%, år 1=65%, år 2=55%, år 3=45%, år 4=40%, år 5=30%, år 6=20%, år 7+=15% av listepris som ny. Gjelder kun over bunnfradraget. Nabobil: 20% (u/boks) / 25% (m/boks). Hyre: ~30%. Leietaker betaler drivstoff/lading. Analysen er ikke skatterådgivning.
+    ${visReal?`Real-visning deflaterer med ${fmtPct(get('inflasjon'))} pr. år.`:''}
+  </div>`;
+
+  document.getElementById('results').innerHTML=html;
+  updateRestverdi();
+  drawChart(p,sL,sB,friKap,a1,a2,a3,ar,modus);
+
+  // Lagre nøkkeltall til KalkulatorHub-broen (brukes av Frihetsplanen og forsiden)
+  if (window.KH) {
+    KH.save('bil', {
+      månedligNettoUtleie: Math.round(kf1 / 12),
+      leieinntektMnd: Math.round((etterPlat1 - skattÅr1) / 12),
+      kontantflytÅr1: Math.round(kf1),
+      merverdiUtleie: Math.round(merverdi),
+      bilverdi: Math.round(p.V0),
+      bilverdiSlutt: Math.round(sL.VN),
+      bilLån: Math.round(p.lan),
+      bilRente: p.lanerente,
+      bilLopetid: p.lanlopetid,
+      utleiedager: p.utleiedager,
+      dagspris: Math.round(dagspris),
+      modus,
+      biltype,
+    });
+  }
+}
+
+function drawChart(p,sL,sB,friKap,a1,a2,a3,ar,modus){
+  const labels=['År 0'];
+  const dL=[],dB=[],dA1=[],dA2=[],dA3=[];
+  const SR=0.22,SA=0.22,SAK=0.22*1.72;
+  const a1n=a1*(1-SR);
+  const eK0=p.V0-p.lan;
+  dL.push(Math.round(eK0/1000)); dB.push(Math.round(eK0/1000));
+  dA1.push(Math.round(friKap/1000)); dA2.push(Math.round(friKap/1000)); dA3.push(Math.round(friKap/1000));
+  let akkL=0,akkB=0;
+  for(let y=1;y<=ar;y++){
+    labels.push('År '+y);
+    akkL+=sL.kfArr[y-1]||0; akkB+=sB.kfArr[y-1]||0;
+    const Vy=bilverdi(p.V0,p.avskr1,p.avskrN,y);
+    const gjL=sL.lanArr[Math.min(y,sL.lanArr.length-1)];
+    const gjB=sB.lanArr[Math.min(y,sB.lanArr.length-1)];
+    const defY=visReal?Math.pow(1+get('inflasjon')/100,y):1;
+    dL.push(Math.round((akkL+Vy-gjL)/defY/1000));
+    dB.push(Math.round((akkB+Vy-gjB)/defY/1000));
+    const v1=friKap*Math.pow(1+a1n,y);
+    const v2b=friKap*Math.pow(1+a2,y); const v2=v2b-Math.max(0,v2b-friKap)*SA;
+    const v3b=friKap*Math.pow(1+a3,y); const v3=v3b-Math.max(0,v3b-friKap)*SAK;
+    dA1.push(Math.round(v1/defY/1000));
+    dA2.push(Math.round(v2/defY/1000));
+    dA3.push(Math.round(v3/defY/1000));
+  }
+  if(!window.Chart)return;
+  if(chartInst)chartInst.destroy();
+  const ctx=document.getElementById('myChart').getContext('2d');
+  const sets=[
+    {label:'Leie ut',data:dL,borderColor:'#7eb8a4',backgroundColor:'rgba(126,184,164,0.07)',borderWidth:2.5,pointRadius:2,fill:true,tension:0.3},
+    {label:'Beholde',data:dB,borderColor:'#6a9fc0',backgroundColor:'transparent',borderWidth:2,pointRadius:2,borderDash:[5,3],tension:0.3},
+  ];
+  if(modus==='investering'){
+    sets.push(
+      {label:`Bank (${(a1*100).toFixed(1)}%)`,data:dA1,borderColor:'#c8a96e',backgroundColor:'transparent',borderWidth:1.5,pointRadius:1,borderDash:[4,4],tension:0.3},
+      {label:`Indeksfond (${(a2*100).toFixed(1)}%)`,data:dA2,borderColor:'#a07eb8',backgroundColor:'transparent',borderWidth:1.5,pointRadius:1,borderDash:[6,3],tension:0.3},
+      {label:`Oslo Børs (${(a3*100).toFixed(1)}%)`,data:dA3,borderColor:'#c8845a',backgroundColor:'transparent',borderWidth:1.5,pointRadius:1,borderDash:[2,4],tension:0.3},
+    );
+  }
+  chartInst=new Chart(ctx,{
+    type:'line',data:{labels,datasets:sets},
+    options:{responsive:true,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{color:'#8a8078',font:{family:'IBM Plex Mono',size:11},boxWidth:20}},
+        tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${new Intl.NumberFormat('no-NO').format(c.raw*1000)} kr`}}},
+      scales:{
+        x:{ticks:{color:'#8a8078',font:{size:10,family:'IBM Plex Mono'}},grid:{color:'#e8e2d6'}},
+        y:{ticks:{color:'#8a8078',font:{size:10,family:'IBM Plex Mono'},callback:v=>(v<0?'−':'')+Math.abs(v/1000).toFixed(1)+' mill'},grid:{color:'#e8e2d6'}}
+      }}
+  });
+}
+
+/* ---- Boot ---- */
+const sc=document.createElement('script');
+sc.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+sc.onload=()=>{ applyAuto(); calculate(); };
+document.head.appendChild(sc);
+
+document.getElementById('alder').addEventListener('input',()=>{
+  displayVal('alder',get('alder')); applyAuto(); calculate();
+});
+document.getElementById('verdi').addEventListener('input',()=>{
+  displayVal('verdi',get('verdi'));
+  if (get('alder') === 0) {
+    setSlider('kjopspris', get('verdi'));
+    setSlider('listepris',  get('verdi'));
+  }
+  calculate();
+});
+document.getElementById('kmaar').addEventListener('input',()=>{
+  displayVal('kmaar',get('kmaar')); applyAuto(); updateKmInfo(); calculate();
+});
+
+SLIDERS.filter(id=>!['alder','verdi','kmaar'].includes(id)).forEach(id=>{
+  const el=document.getElementById(id); if(!el)return;
+  displayVal(id,parseFloat(el.value));
+  el.addEventListener('input',()=>{ displayVal(id,parseFloat(el.value)); calculate(); });
+});
+</script>
+</body>
+</html>

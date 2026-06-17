@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frihetsplanen — Lev livet du faktisk vil leve</title>
+<link rel="stylesheet" href="css/design.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HEADER + NAVIGASJON
+═══════════════════════════════════════════════════════════ -->
+<header class="fp-header">
+  <div class="fp-logo">Frihets<span>planen</span></div>
+  <nav class="fp-nav">
+    <div class="fp-nav-steg aktiv" data-nr="1" onclick="Steg.gåTil(1)">
+      <span class="fp-nav-nr">1</span>
+      <span>Hva vil du?</span>
+    </div>
+    <div class="fp-nav-steg" data-nr="2" onclick="Steg.gåTil(2)">
+      <span class="fp-nav-nr">2</span>
+      <span>Livet ditt nå</span>
+    </div>
+    <div class="fp-nav-steg" data-nr="3" onclick="Steg.gåTil(3)">
+      <span class="fp-nav-nr">3</span>
+      <span>Skjulte penger</span>
+    </div>
+    <div class="fp-nav-steg" data-nr="4" onclick="Steg.gåTil(4)">
+      <span class="fp-nav-nr">4</span>
+      <span>Din plan</span>
+    </div>
+  </nav>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════
+     STEG 1: HVA VIL DU?
+═══════════════════════════════════════════════════════════ -->
+<section class="fp-steg aktiv" data-steg="1">
+  <div class="fp-hero">
+    <div class="fp-hero-eyebrow">Frihetsplanen · 2025</div>
+    <h1 class="fp-hero-tittel">
+      Ikke spar deg til et<br>
+      <em>kjedelig liv.</em><br>
+      Planlegg et bedre ett.
+    </h1>
+    <p class="fp-hero-sub">
+      Velg hva du faktisk vil ha frihet til — så viser vi deg
+      konkret hva det krever, hvilke grep som finansierer det,
+      og når du er der.
+    </p>
+  </div>
+
+  <div class="fp-mål-seksjon">
+    <div class="fp-mål-overskrift">Hva vil du ha frihet til?</div>
+    <div id="fp-mål-grid"><!-- fylles av JS --></div>
+    <div id="fp-mål-ekstra"><!-- ekstrafelter per valgt mål --></div>
+
+    <div class="fp-knapp-rad" style="justify-content:flex-end;">
+      <button class="fp-knapp fp-knapp-primær" id="fp-neste-1" disabled onclick="Steg.neste()">
+        Velg minst ett mål
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     STEG 2: LIVET DITT NÅ
+═══════════════════════════════════════════════════════════ -->
+<section class="fp-steg" data-steg="2">
+  <div class="fp-steg2-wrap">
+    <h2 class="fp-steg-tittel">Slik ser <em>livet ditt</em> ut nå</h2>
+    <p class="fp-steg-intro">
+      Noen få tall om din situasjon — vi beregner resten.
+      Ingen data lagres utenfor nettleseren din.
+    </p>
+    <div id="fp-steg2-innhold"><!-- fylles av JS --></div>
+
+    <div class="fp-knapp-rad">
+      <button class="fp-knapp fp-knapp-sekundær" onclick="Steg.forrige()">← Tilbake</button>
+      <button class="fp-knapp fp-knapp-primær" onclick="Steg.neste()">Se hva pengene egentlig koster deg →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     STEG 3: SKJULTE KOSTNADER
+═══════════════════════════════════════════════════════════ -->
+<section class="fp-steg" data-steg="3">
+  <div class="fp-steg3-wrap">
+    <h2 class="fp-steg-tittel">Her er pengene <em>du ikke ser</em></h2>
+    <p class="fp-steg-intro">
+      Basert på tallene dine — hva koster valgene dine egentlig,
+      og hva kunne de gitt deg?
+    </p>
+    <div id="fp-steg3-innhold"><!-- fylles av JS --></div>
+    <div id="fp-steg3-graf"><!-- tre-graf-sammenligning fylles av JS --></div>
+
+    <div class="fp-knapp-rad">
+      <button class="fp-knapp fp-knapp-sekundær" onclick="Steg.forrige()">← Tilbake</button>
+      <button class="fp-knapp fp-knapp-primær" onclick="Steg.neste()">Se frihetsplanen din →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     STEG 4: DIN FRIHETSPLAN
+═══════════════════════════════════════════════════════════ -->
+<section class="fp-steg" data-steg="4">
+  <div class="fp-steg4-wrap">
+    <h2 class="fp-steg-tittel"><em>Frihetsplanen</em> din</h2>
+    <p class="fp-steg-intro">
+      Konkrete milepæler — hva du kan ha råd til, når du er der,
+      og hvilke grep som får deg dit raskere.
+    </p>
+    <div id="fp-steg4-innhold"><!-- fylles av JS --></div>
+    <div id="fp-optimaliser-knapp"><!-- "Hjelp meg å nå målet" fylles av JS --></div>
+    <div id="fp-optimaliser-resultat"><!-- handlingsplan fylles av JS --></div>
+    <div id="fp-del-kort"><!-- delbart story-bilde fylles av JS --></div>
+
+    <div class="fp-knapp-rad" style="justify-content:space-between;margin-top:48px;">
+      <button class="fp-knapp fp-knapp-sekundær" onclick="Steg.forrige()">← Juster tallene</button>
+      <button class="fp-knapp fp-knapp-primær" onclick="Render.visPensjonsskjerm()">Se pensjonsmuligheter →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PENSJON — separat skjerm, UTENFOR hovedflyten (valgfri)
+═══════════════════════════════════════════════════════════ -->
+<section class="fp-pensjon-skjerm" id="fp-pensjon-skjerm" style="display:none;">
+  <div class="fp-steg4-wrap">
+    <h2 class="fp-steg-tittel">Et lite <em>blikk</em> på pensjon</h2>
+    <p class="fp-steg-intro">
+      Helt valgfritt — bare for å vise hva den optimaliserte planen din også
+      kunne bety for pensjonen, hvis du ville. Men du ser bare halvparten her —
+      resten er det du skal leve med nå.
+    </p>
+    <div id="fp-pensjon-innhold"><!-- fylles av JS --></div>
+
+    <div class="fp-knapp-rad" style="margin-top:32px;">
+      <button class="fp-knapp fp-knapp-sekundær" onclick="Render.lukkPensjonsskjerm()">← Tilbake til planen</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCRIPTS — rekkefølge er viktig
+═══════════════════════════════════════════════════════════ -->
+<script src="js/global.js"></script>
+<script src="js/data.js"></script>
+<script src="js/beregn.js"></script>
+<script src="js/steg.js"></script>
+<script src="js/render.js"></script>
+<script>
+  // Boot — kjøres etter alle moduler er lastet
+  document.addEventListener('DOMContentLoaded', function() {
+    Render.tegnSteg1();
+    Render.tegnSteg2();
+    Render.oppdaterNesteKnapp1();
+  });
+</script>
+
+</body>
+</html>

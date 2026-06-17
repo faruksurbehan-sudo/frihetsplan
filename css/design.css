@@ -1,0 +1,836 @@
+/* ============================================================
+   Frihetsplanen — design.css
+   Visuell identitet: rom, lys og retning.
+   Ikke en sparekalkulator — et veikart for et bedre liv.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,700;1,300&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500&display=swap');
+
+/* ── Tokens ── */
+:root {
+  --bg:        #f7f4ef;      /* varm pergament — ikke hvit, ikke krem */
+  --surface:   #ffffff;
+  --surface2:  #f0ece4;
+  --border:    #e0d9ce;
+  --text:      #1a1714;
+  --muted:     #8a8078;
+  --accent:    #c17a3a;      /* varm kobber — frihet har en varm farge */
+  --grønn:     #3a7a5a;      /* skoggrønn — ikke neongrønn */
+  --rød:       #8a3a3a;
+  --blå:       #3a5a8a;
+  --lys-accent:#f0e4d4;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+  --font-mono:    'IBM Plex Mono', monospace;
+
+  --radius:    4px;
+  --radius-lg: 12px;
+  --shadow:    0 2px 16px rgba(26,23,20,0.08);
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+.fp-header {
+  padding: 28px 40px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.fp-logo {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--accent);
+  letter-spacing: -0.5px;
+}
+.fp-logo span { color: var(--muted); font-style: italic; font-weight: 300; }
+
+/* ── Steg-navigasjon ── */
+.fp-nav {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+.fp-nav-steg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  user-select: none;
+}
+.fp-nav-steg.aktiv {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.fp-nav-steg.fullfort {
+  color: var(--grønn);
+}
+.fp-nav-nr {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.fp-nav-steg.aktiv .fp-nav-nr { background: var(--accent); color: white; }
+.fp-nav-steg.fullfort .fp-nav-nr { background: var(--grønn); color: white; }
+
+/* ── Steg-innhold ── */
+.fp-steg { display: none; }
+.fp-steg.aktiv { display: block; }
+
+/* ── Hero (steg 1) ── */
+.fp-hero {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 72px 40px 48px;
+  text-align: center;
+}
+.fp-hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+.fp-hero-tittel {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 6vw, 64px);
+  font-weight: 300;
+  line-height: 1.1;
+  color: var(--text);
+  margin-bottom: 20px;
+  letter-spacing: -1px;
+}
+.fp-hero-tittel em {
+  font-style: italic;
+  color: var(--accent);
+}
+.fp-hero-sub {
+  font-size: 17px;
+  color: var(--muted);
+  max-width: 520px;
+  margin: 0 auto 48px;
+  line-height: 1.7;
+}
+
+/* ── Mål-grid ── */
+.fp-mål-seksjon { max-width: 900px; margin: 0 auto; padding: 0 40px 48px; }
+.fp-mål-overskrift {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 20px;
+  text-align: center;
+}
+#fp-mål-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 32px;
+}
+.fp-mål-kort {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px 20px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.18s;
+  user-select: none;
+}
+.fp-mål-kort:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+.fp-mål-kort.valgt {
+  border-color: var(--accent);
+  background: var(--lys-accent);
+}
+.fp-mål-ikon { font-size: 28px; margin-bottom: 10px; }
+.fp-mål-tittel {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.fp-mål-sub { font-size: 12px; color: var(--muted); line-height: 1.4; }
+.fp-mål-check {
+  position: absolute;
+  top: 12px; right: 14px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  color: white;
+  background: transparent;
+  transition: all 0.15s;
+}
+.fp-mål-kort.valgt .fp-mål-check {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Ekstra mål-felter */
+#fp-mål-ekstra { margin-bottom: 32px; }
+.fp-mål-ekstra-rad {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.fp-mål-ekstra-ikon { font-size: 18px; }
+.fp-mål-ekstra-label { font-size: 13px; color: var(--text); flex: 1; min-width: 180px; }
+.fp-slider-rad { display: flex; align-items: center; gap: 10px; flex: 1; }
+.fp-slider-val {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent);
+  min-width: 80px;
+  text-align: right;
+}
+.fp-tekst-input {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 7px 12px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+}
+.fp-tekst-input:focus { border-color: var(--accent); }
+
+/* ── Steg 2: Livssituasjon ── */
+.fp-steg2-wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 40px;
+}
+.fp-steg-tittel {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 4vw, 40px);
+  font-weight: 300;
+  color: var(--text);
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+.fp-steg-tittel em { font-style: italic; color: var(--accent); }
+.fp-steg-intro { font-size: 15px; color: var(--muted); margin-bottom: 40px; line-height: 1.6; }
+
+.fp-seksjon {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.fp-seksjon-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 22px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.fp-seksjon-ikon { font-size: 16px; }
+.fp-seksjon-tittel { letter-spacing: 2px; }
+
+.fp-felt { padding: 16px 22px; border-bottom: 1px solid #f0ece4; }
+.fp-felt:last-child { border-bottom: none; }
+.fp-felt-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.fp-felt-label { font-size: 13px; color: var(--text); }
+.fp-felt-val { font-family: var(--font-mono); font-size: 12px; color: var(--accent); }
+.fp-felt-info { font-size: 11px; color: var(--muted); margin-bottom: 8px; font-family: var(--font-mono); }
+
+/* ── Import-kort: kobler felt til andre KalkulatorHub-kalkulatorer ── */
+.fp-import-kort {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  padding: 9px 12px;
+  border-radius: var(--radius);
+}
+.fp-import-funnet {
+  background: #eef6f0;
+  border: 1px solid #cfe6d6;
+}
+.fp-import-mangler {
+  background: var(--surface2);
+  border: 1px dashed var(--border);
+}
+.fp-import-merke {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--grønn);
+  white-space: nowrap;
+}
+.fp-import-verdi {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  flex: 1;
+}
+.fp-import-bruk {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  padding: 5px 12px;
+  border-radius: 14px;
+  background: var(--grønn);
+  color: white;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.fp-import-bruk:hover { opacity: 0.85; }
+.fp-import-lenke {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.fp-kategori-kalkulator-lenke {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent);
+  text-decoration: none;
+  background: var(--lys-accent);
+  border-radius: var(--radius);
+  padding: 8px 14px;
+  margin-bottom: 16px;
+}
+.fp-kategori-kalkulator-lenke:hover { text-decoration: underline; }
+.fp-import-lenke:hover { text-decoration: underline; }
+
+/* ── Felt-konflikt: f.eks. leasing + bilutleie samtidig ── */
+.fp-felt-konflikt { padding-bottom: 16px; }
+.fp-konflikt-varsel {
+  background: #fbeeee;
+  border: 1px solid #e3bcbc;
+  border-left: 3px solid var(--rød);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #7a3434;
+  line-height: 1.6;
+}
+
+/* ── Sliders ── */
+.fp-slider, input[type="range"] {
+  width: 100%;
+  -webkit-appearance: none;
+  height: 2px;
+  background: var(--border);
+  border-radius: 2px;
+  outline: none;
+}
+.fp-slider::-webkit-slider-thumb, input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; height: 14px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.fp-slider::-webkit-slider-thumb:hover, input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.3);
+}
+
+/* ── Steg 3: Skjulte kostnader ── */
+.fp-steg3-wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 48px 40px;
+}
+.fp-økonomi-oversikt {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 32px;
+}
+.fp-øk-rad {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--surface2);
+  font-size: 14px;
+}
+.fp-øk-rad:last-child { border-bottom: none; }
+.fp-øk-rad.total { border-top: 1.5px solid var(--border); border-bottom: none; font-weight: 500; }
+.fp-øk-label { color: var(--muted); }
+.fp-øk-val { font-family: var(--font-mono); font-size: 13px; }
+.fp-øk-val.pos { color: var(--grønn); }
+.fp-øk-val.neg { color: var(--rød); }
+
+.fp-innsikt-liste { display: flex; flex-direction: column; gap: 12px; }
+.fp-innsikt-kort {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 14px;
+  align-items: start;
+  transition: box-shadow 0.2s;
+}
+.fp-innsikt-kort:hover { box-shadow: var(--shadow); }
+.fp-innsikt-ikon { font-size: 22px; margin-top: 2px; }
+.fp-innsikt-innhold { min-width: 0; }
+.fp-innsikt-tittel {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--text);
+  margin-bottom: 5px;
+}
+.fp-innsikt-beskriv { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+.fp-innsikt-innsikt {
+  font-size: 13px;
+  color: var(--grønn);
+  font-family: var(--font-mono);
+}
+.fp-innsikt-handling {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--accent);
+  white-space: nowrap;
+  margin-top: 4px;
+  cursor: pointer;
+}
+.fp-innsikt-handling:hover { text-decoration: underline; }
+
+/* ── Steg 4: Frihetsplanen ── */
+.fp-steg4-wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 48px 40px;
+}
+.fp-score {
+  text-align: center;
+  padding: 40px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 40px;
+}
+.fp-score-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.fp-score-tall {
+  font-family: var(--font-display);
+  font-size: 64px;
+  font-weight: 300;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.fp-score-sub { font-size: 14px; color: var(--muted); }
+
+.fp-uten-tiltak-varsel {
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  max-width: 480px;
+  margin: -16px auto 32px;
+  line-height: 1.6;
+}
+.fp-uten-tiltak-varsel strong { color: var(--text); }
+
+.fp-tidslinje { position: relative; }
+.fp-tidslinje::before {
+  content: '';
+  position: absolute;
+  left: 52px;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: var(--border);
+}
+
+.fp-milepæl {
+  display: grid;
+  grid-template-columns: 105px 48px 1fr;
+  gap: 16px;
+  align-items: start;
+  margin-bottom: 28px;
+  position: relative;
+}
+.fp-milepæl.nærmest .fp-milepæl-tid { color: var(--accent); }
+.fp-milepæl-tid {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  text-align: right;
+  padding-top: 4px;
+  line-height: 1.4;
+}
+.fp-milepæl-ikon {
+  font-size: 26px;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 48px; height: 48px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+.fp-milepæl.nærmest .fp-milepæl-ikon {
+  border-color: var(--accent);
+  background: var(--lys-accent);
+}
+.fp-milepæl-innhold {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+}
+.fp-milepæl.nærmest .fp-milepæl-innhold {
+  border-color: var(--accent);
+  background: #fffaf5;
+}
+.fp-milepæl-tittel { font-size: 15px; color: var(--text); margin-bottom: 4px; }
+.fp-milepæl-kostnad {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+.fp-grep-liste { display: flex; flex-direction: column; gap: 5px; }
+.fp-grep { font-size: 12px; color: var(--grønn); font-family: var(--font-mono); }
+
+/* ── Navigasjonsknapper ── */
+.fp-knapp-rad {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 40px;
+  gap: 12px;
+}
+.fp-knapp {
+  padding: 14px 28px;
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+}
+.fp-knapp-primær {
+  background: var(--accent);
+  color: white;
+}
+.fp-knapp-primær:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+.fp-knapp-primær:disabled {
+  background: var(--border);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+.fp-knapp-sekundær {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+.fp-knapp-sekundær:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── Kategori-bryterknapper (generisk for bolig, transport, vaner) ── */
+.fp-kategori-blokk { margin-bottom: 8px; }
+.fp-kategori { margin-bottom: 16px; }
+.fp-kategori-innhold { padding: 18px 22px; }
+.fp-bryter-gruppe {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.fp-bryter-liten { margin-bottom: 12px; }
+.fp-bryter {
+  padding: 9px 18px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.fp-bryter:hover { border-color: var(--accent); color: var(--accent); }
+.fp-bryter.aktiv {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  font-weight: 500;
+}
+.fp-underspørsmål {
+  padding-top: 14px;
+  margin-top: 4px;
+  border-top: 1px dashed var(--border);
+}
+.fp-underspørsmål-tekst {
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.fp-mål-oppfølging {
+  background: var(--lys-accent) !important;
+}
+
+/* ── Tom-tilstand i steg 3 ── */
+.fp-tom {
+  text-align: center;
+  padding: 32px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+}
+
+/* ── Visste du at: fast overskrift over innsikt-kort ── */
+.fp-visste-du-at {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-style: italic;
+  color: var(--text);
+  margin: 32px 0 16px;
+}
+
+/* ── Tre-graf-sammenligning (steg 3) ── */
+.fp-graf-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px 26px;
+  margin-top: 32px;
+}
+.fp-graf-tittel {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+.fp-graf-intro { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+.fp-graf-legende {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 18px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.fp-graf-legende-rad { display: flex; align-items: center; gap: 6px; }
+.fp-graf-prikk { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.fp-graf-prikk.kurve1 { background: var(--muted); }
+.fp-graf-prikk.kurve2 { background: var(--accent); }
+.fp-graf-prikk.kurve3 { background: var(--grønn); }
+
+.fp-graf-spesifikasjon {
+  background: var(--surface2);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: 22px;
+}
+.fp-graf-spesifikasjon-tittel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.fp-graf-spes-rad {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--text);
+  padding: 5px 0;
+}
+.fp-graf-spes-rad strong { font-family: var(--font-mono); font-size: 12px; color: var(--grønn); white-space: nowrap; }
+.fp-graf-spes-tom span { color: var(--muted); font-style: italic; }
+.fp-graf-sluttverdier {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-top: 20px;
+}
+.fp-graf-sluttverdi {
+  text-align: center;
+  padding: 14px 10px;
+  background: var(--surface2);
+  border-radius: var(--radius);
+}
+.fp-graf-sluttverdi span { display: block; font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+.fp-graf-sluttverdi strong { font-family: var(--font-display); font-size: 17px; color: var(--text); }
+.fp-graf-sluttverdi.kurve1 strong { color: var(--muted); }
+.fp-graf-sluttverdi.kurve2 strong { color: var(--accent); }
+.fp-graf-sluttverdi.kurve3 strong { color: var(--grønn); }
+
+/* ── Optimaliseringskort: "Hjelp meg å nå målet" ── */
+.fp-optimalisering-kort {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px 26px;
+  margin-top: 16px;
+}
+.fp-optimalisering-tittel {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.fp-optimalisering-intro { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
+.fp-tiltak-liste { display: flex; flex-direction: column; gap: 10px; }
+.fp-tiltak-rad {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--surface2);
+  border-radius: var(--radius);
+}
+.fp-tiltak-tekst { font-size: 13px; color: var(--text); }
+.fp-tiltak-beløp { font-family: var(--font-mono); font-size: 13px; color: var(--grønn); white-space: nowrap; }
+.fp-optimalisering-sammenligning {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 22px;
+  padding-top: 22px;
+  border-top: 1px solid var(--border);
+}
+.fp-sammenligning-rad { text-align: center; }
+.fp-sammenligning-rad span { display: block; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+.fp-sammenligning-rad strong { font-family: var(--font-display); font-size: 18px; color: var(--text); }
+.fp-sammenligning-rad.ny strong { color: var(--grønn); }
+.fp-sammenligning-pil { font-size: 20px; color: var(--accent); }
+
+.fp-optimalisering-note {
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 14px;
+  font-style: italic;
+}
+
+/* ── Pensjonsskjerm ── */
+.fp-pensjon-skjerm { background: var(--bg); min-height: 60vh; }
+.fp-pensjon-fordeling {
+  text-align: center;
+  font-size: 14px;
+  color: var(--muted);
+  max-width: 560px;
+  margin: 0 auto 24px;
+  line-height: 1.6;
+}
+.fp-pensjon-fordeling strong { color: var(--text); }
+.fp-pensjon-kort-rad {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 28px;
+}
+.fp-pensjon-kort {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px 22px;
+  text-align: center;
+}
+.fp-pensjon-kort-tittel { font-family: var(--font-mono); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+.fp-pensjon-kort-verdi { font-family: var(--font-display); font-size: 30px; color: var(--accent); margin-bottom: 8px; }
+.fp-pensjon-kort-sub { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.fp-pensjon-rest {
+  background: #eef6f0;
+  border: 1px solid #cfe6d6;
+  border-radius: var(--radius-lg);
+  padding: 32px 28px;
+  text-align: center;
+}
+.fp-pensjon-rest-emoji { font-size: 40px; margin-bottom: 12px; }
+.fp-pensjon-rest-tittel { font-family: var(--font-display); font-size: 22px; color: var(--grønn); margin-bottom: 10px; }
+.fp-pensjon-rest-tekst { font-size: 15px; color: var(--text); margin-bottom: 18px; line-height: 1.6; }
+
+/* ── Responsivt ── */
+@media (max-width: 700px) {
+  .fp-header { padding: 18px 20px; }
+  .fp-hero { padding: 48px 20px 32px; }
+  .fp-mål-seksjon, .fp-steg2-wrap, .fp-steg3-wrap, .fp-steg4-wrap { padding: 32px 20px; }
+  #fp-mål-grid { grid-template-columns: 1fr 1fr; }
+  .fp-nav-steg span:not(.fp-nav-nr) { display: none; }
+  .fp-milepæl { grid-template-columns: 80px 40px 1fr; }
+  .fp-tidslinje::before { left: 40px; }
+  .fp-innsikt-kort { grid-template-columns: 1fr; }
+  .fp-innsikt-handling { margin-top: 8px; }
+  .fp-graf-sluttverdier { grid-template-columns: 1fr; }
+  .fp-pensjon-kort-rad { grid-template-columns: 1fr; }
+  .fp-optimalisering-sammenligning { flex-direction: column; gap: 10px; }
+}
+@media (max-width: 400px) {
+  #fp-mål-grid { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }

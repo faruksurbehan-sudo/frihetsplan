@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Utleiebolig — Beholde eller selge?</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,700;1,300&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #f7f4ef; --surface: #ffffff; --surface2: #f0ece4;
+    --border: #e0d9ce; --accent: #c17a3a; --text: #1a1714;
+    --muted: #8a8078; --green: #3a7a5a; --red: #8a3a3a;
+    --blue: #3a5a8a; --purple: #6a4a8a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-weight: 300; }
+
+  header { padding: 36px 32px 22px; border-bottom: 1px solid var(--border); background: var(--surface); }
+  header h1 { font-family: 'Fraunces', serif; font-size: clamp(20px,4vw,34px); font-weight: 400; color: var(--accent); }
+  header p { font-size: 12px; color: var(--muted); margin-top: 5px; font-family: 'IBM Plex Mono', monospace; }
+  header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; }
+  .hub-lenke { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; padding-top: 4px; }
+  .hub-lenke:hover { color: var(--accent); }
+
+  .layout { display: grid; grid-template-columns: 370px 1fr; min-height: calc(100vh - 90px); }
+  .sidebar { background: var(--surface); border-right: 1px solid var(--border); padding: 24px 22px; overflow-y: auto; }
+  .main { padding: 26px 30px; overflow-y: auto; }
+
+  .section-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; padding-bottom: 7px; border-bottom: 1px solid var(--border); }
+  .sidebar-section { margin-bottom: 26px; }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 5px; font-family: 'IBM Plex Mono', monospace; }
+  .field-row { display: flex; align-items: center; gap: 8px; }
+
+  input[type="range"] { flex: 1; -webkit-appearance: none; height: 2px; background: var(--border); border-radius: 2px; outline: none; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; background: var(--accent); border-radius: 50%; cursor: pointer; transition: transform 0.15s; }
+  input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.3); }
+
+  .val { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent); min-width: 88px; text-align: right; }
+
+  .toggle-btn { flex: 1; padding: 6px 8px; background: var(--surface); border: 1px solid var(--border); color: var(--muted); font-family: 'IBM Plex Mono', monospace; font-size: 11px; cursor: pointer; border-radius: 2px; transition: all 0.15s; }
+  .toggle-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 500; }
+  .toggle-btn:hover:not(.active) { border-color: var(--accent); color: var(--accent); }
+
+  .infobox { font-size: 11px; color: #776e63; font-family: 'IBM Plex Mono', monospace; line-height: 1.6; background: var(--surface2); padding: 9px 11px; border-radius: 2px; border: 1px solid var(--border); margin-bottom: 12px; }
+
+  /* Results */
+  .verdict { background: var(--surface2); border: 1px solid var(--border); border-radius: 2px; padding: 22px 26px; margin-bottom: 24px; position: relative; overflow: hidden; }
+  .verdict::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent); }
+  .verdict.beholde::before { background: var(--green); }
+  .verdict.selge::before { background: var(--red); }
+  .verdict-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
+  .verdict-title { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 700; margin-bottom: 7px; }
+  .verdict-title.green { color: var(--green); } .verdict-title.red { color: var(--red); } .verdict-title.neutral { color: var(--accent); }
+  .verdict-sub { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  .real-toggle-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+  .real-toggle-label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); }
+  .real-badge { font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 3px 8px; border-radius: 10px; background: #eef6f0; border: 1px solid var(--green); color: var(--green); display: none; }
+  .real-badge.visible { display: inline-block; }
+
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+  .card { background: var(--surface2); border: 1px solid var(--border); border-radius: 2px; padding: 18px; }
+  .card-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 9px; }
+  .card-value { font-family: 'Fraunces', serif; font-size: 21px; font-weight: 700; color: var(--accent); }
+  .card-value.green { color: var(--green); } .card-value.red { color: var(--red); }
+  .card-sub { font-size: 11px; color: var(--muted); margin-top: 4px; font-family: 'IBM Plex Mono', monospace; }
+
+  .breakdown { background: var(--surface2); border: 1px solid var(--border); border-radius: 2px; margin-bottom: 24px; }
+  .breakdown-header { padding: 12px 18px; border-bottom: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; }
+  td { padding: 10px 18px; font-size: 13px; border-bottom: 1px solid #e8e2d6; }
+  td:last-child { text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+  tr.subtotal td { border-top: 1px solid var(--border); font-weight: 500; }
+  tr.total td { border-top: 1px solid var(--accent); font-weight: 500; color: var(--accent); font-size: 14px; }
+  .pos { color: var(--green); } .neg { color: var(--red); }
+
+  .chart-wrap { background: var(--surface2); border: 1px solid var(--border); border-radius: 2px; padding: 22px; margin-bottom: 24px; }
+  .chart-title { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 18px; }
+  canvas { width: 100% !important; }
+
+  /* Målleie-seksjon */
+  .målleie-wrap { margin-bottom: 24px; }
+  .målleie-header { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--green); margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #cfe6d6; }
+  .målleie-intro { font-size: 12px; color: var(--muted); margin-bottom: 14px; line-height: 1.5; }
+  .målleie-row { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; background: var(--surface2); border: 1px solid var(--border); border-radius: 2px; padding: 14px 18px; margin-bottom: 8px; transition: border-color 0.2s; }
+  .målleie-row:hover { border-color: #c7bdb0; }
+  .ml-name { font-size: 13px; color: var(--text); }
+  .ml-rate { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); }
+  .ml-leie { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; color: var(--green); text-align: right; }
+  .ml-leie span { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); }
+  .ml-diff { font-family: 'IBM Plex Mono', monospace; font-size: 10px; text-align: right; margin-top: 2px; }
+  .ml-diff.up { color: var(--accent); } .ml-diff.ok { color: var(--green); }
+  .ml-right { text-align: right; }
+
+  /* Sensitivitetsanalyse */
+  .sensitivitet-wrap { margin-bottom: 24px; padding: 22px; background: var(--surface2); border: 1px solid var(--border); border-radius: 2px; }
+  .sens-header { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .sens-intro { font-size: 12px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+  .sens-row { display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; align-items: center; margin-bottom: 10px; }
+  .sens-rank { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #b0a89a; }
+  .sens-name { font-size: 12px; color: var(--text); margin-bottom: 5px; }
+  .sens-retning { color: var(--muted); font-size: 11px; }
+  .sens-bar-wrap { height: 4px; background: var(--border); border-radius: 2px; }
+  .sens-bar { height: 4px; border-radius: 2px; transition: width 0.3s; }
+  .sens-bar.pos { background: var(--green); }
+  .sens-bar.neg { background: var(--red); }
+  .sens-val { font-family: 'IBM Plex Mono', monospace; font-size: 11px; min-width: 80px; text-align: right; }
+
+  /* Primærbolig */
+  .primær-wrap { margin-bottom: 24px; padding: 22px; background: var(--surface2); border: 1px solid var(--border); border-radius: 2px; }
+  .primær-header { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+  .primær-intro { font-size: 13px; color: var(--muted); margin-bottom: 14px; line-height: 1.6; }
+  .primær-intro strong { color: var(--text); }
+
+  .note { font-size: 11px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; line-height: 1.7; padding: 13px 18px; background: var(--surface2); border: 1px solid var(--border); border-radius: 2px; }
+
+  @media (max-width: 800px) { .layout { grid-template-columns: 1fr; } .sidebar { border-right: none; border-bottom: 1px solid var(--border); } }
+  @media (max-width: 500px) { .cards { grid-template-columns: 1fr; } header, .sidebar, .main { padding: 18px 14px; } .målleie-row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Utleiebolig — Beholde eller selge?</h1>
+    <p>Investeringsanalyse · Oslo · Sekundærbolig</p>
+  </div>
+  <a class="hub-lenke" href="../index.html">← KalkulatorHub</a>
+</header>
+
+<script src="../js/global.js"></script>
+
+<div class="layout">
+<aside class="sidebar">
+
+  <div class="sidebar-section">
+    <div class="section-label">Investeringshorisont</div>
+    <div class="field">
+      <label>Antall år du beholder boligen</label>
+      <div class="field-row"><input type="range" id="horisont" min="1" max="30" step="1" value="15"><span class="val" id="horisont-val"></span></div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label">Boligens verdier</div>
+    <div class="field">
+      <label>Markedsverdi nå</label>
+      <div class="field-row"><input type="range" id="verdi" min="2000000" max="15000000" step="100000" value="4200000"><span class="val" id="verdi-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Eksisterende gjeld</label>
+      <div class="field-row"><input type="range" id="gjeld" min="0" max="10000000" step="100000" value="900000"><span class="val" id="gjeld-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Opprinnelig kjøpspris</label>
+      <div class="field-row"><input type="range" id="kjøpspris" min="500000" max="15000000" step="100000" value="2500000"><span class="val" id="kjøpspris-val"></span></div>
+    </div>
+    <div class="infobox">ℹ Gevinst = salgssum netto − kjøpspris − oppussing. Tap gir 0 i skatt.</div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label">Oppussing</div>
+    <div class="field">
+      <label>Skal boligen pusses opp?</label>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="toggle-btn active" id="btn-opp-ja" onclick="setOppussing('ja')">Ja</button>
+        <button class="toggle-btn" id="btn-opp-nei" onclick="setOppussing('nei')">Nei</button>
+      </div>
+    </div>
+    <div id="opp-detaljer">
+      <div class="field">
+        <label>Oppussingskostnad</label>
+        <div class="field-row"><input type="range" id="oppussing" min="0" max="5000000" step="50000" value="650000"><span class="val" id="oppussing-val"></span></div>
+      </div>
+      <div class="field">
+        <label>Finansiering av oppussing</label>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <button class="toggle-btn active" id="btn-opp-kontant" onclick="setOppFinansiering('kontant')">Kontant</button>
+          <button class="toggle-btn" id="btn-opp-lan" onclick="setOppFinansiering('lån')">Lån</button>
+        </div>
+      </div>
+      <div class="infobox" id="opp-info-kontant">
+        ℹ Kontant: beløpet trekkes fra fri kapital dag 1 og reduserer alternativ-plasseringen tilsvarende.
+      </div>
+      <div id="opp-lan-detaljer" style="display:none;">
+        <div class="field">
+          <label>Rente oppussingslån (%)</label>
+          <div class="field-row"><input type="range" id="opp-rente" min="2" max="10" step="0.1" value="5.5"><span class="val" id="opp-rente-val"></span></div>
+        </div>
+        <div class="field">
+          <label>Løpetid oppussingslån (år)</label>
+          <div class="field-row"><input type="range" id="opp-lopetid" min="3" max="25" step="1" value="10"><span class="val" id="opp-lopetid-val"></span></div>
+        </div>
+        <div class="infobox">
+          ℹ Lån: terminbeløp inngår i kontantflyt. Renter er fradragsberettiget mot leieinntekt. Gjeld summeres med eksisterende lån i formuesberegning.
+        </div>
+      </div>
+    </div>
+
+  <div class="sidebar-section">
+    <div class="section-label">Leieinntekter og kostnader</div>
+    <div class="field">
+      <label>Månedlig leie (etter oppussing)</label>
+      <div class="field-row"><input type="range" id="leie" min="8000" max="30000" step="500" value="16000"><span class="val" id="leie-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Årlig leievekst / KPI-regulering (%)</label>
+      <div class="field-row"><input type="range" id="leievekst" min="0" max="6" step="0.25" value="2.5"><span class="val" id="leievekst-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Felleskostnader / mnd</label>
+      <div class="field-row"><input type="range" id="felles" min="500" max="8000" step="100" value="2480"><span class="val" id="felles-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Årlig vekst felleskostnader (%)</label>
+      <div class="field-row"><input type="range" id="fellesvekst" min="0" max="6" step="0.25" value="3.0"><span class="val" id="fellesvekst-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Forsikring utleiebolig (kr/år)</label>
+      <div class="field-row"><input type="range" id="forsikring" min="0" max="20000" step="500" value="5000"><span class="val" id="forsikring-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Uforutsette kostnader (% av boligverdi/år)</label>
+      <div class="field-row"><input type="range" id="uforutsett" min="0" max="2" step="0.1" value="0.5"><span class="val" id="uforutsett-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Inflasjon på uforutsette kostnader (%)</label>
+      <div class="field-row"><input type="range" id="kostnadsvekst" min="0" max="5" step="0.25" value="2.5"><span class="val" id="kostnadsvekst-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Ledighet (mnd/år)</label>
+      <div class="field-row"><input type="range" id="ledighet" min="0" max="3" step="0.5" value="0.5"><span class="val" id="ledighet-val"></span></div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label">Finansiering</div>
+    <div class="field">
+      <label>Lånetype</label>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="toggle-btn active" id="btn-annuitet" onclick="setLånetype('annuitet')">Annuitetslån</button>
+        <button class="toggle-btn" id="btn-avdragsfri" onclick="setLånetype('avdragsfri')">Avdragsfritt</button>
+      </div>
+    </div>
+    <div class="field" id="field-lopetid">
+      <label>Lånets løpetid (år)</label>
+      <div class="field-row"><input type="range" id="lopetid" min="5" max="30" step="1" value="25"><span class="val" id="lopetid-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Rente på lån (%)</label>
+      <div class="field-row"><input type="range" id="rente" min="2" max="8" step="0.1" value="5.5"><span class="val" id="rente-val"></span></div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label">Alternative plasseringer</div>
+    <div class="field">
+      <label>Bankinnskudd / rente (%)</label>
+      <div class="field-row"><input type="range" id="alt1" min="1" max="8" step="0.1" value="4.0"><span class="val" id="alt1-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Globalt indeksfond (%)</label>
+      <div class="field-row"><input type="range" id="alt2" min="3" max="12" step="0.25" value="7.0"><span class="val" id="alt2-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Oslo Børs / aksjer (%)</label>
+      <div class="field-row"><input type="range" id="alt3" min="3" max="15" step="0.25" value="8.0"><span class="val" id="alt3-val"></span></div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label">Vekst og skatt</div>
+    <div class="field">
+      <label>Årlig prisvekst bolig (%)</label>
+      <div class="field-row"><input type="range" id="prisvekst" min="0" max="6" step="0.25" value="3.0"><span class="val" id="prisvekst-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Inflasjon — for realverdi-visning (%)</label>
+      <div class="field-row"><input type="range" id="inflasjon" min="0" max="6" step="0.25" value="2.5"><span class="val" id="inflasjon-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Skatt på leieinntekt (%)</label>
+      <div class="field-row"><input type="range" id="skatt" min="20" max="45" step="1" value="22"><span class="val" id="skatt-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Gevinstskatt ved salg (%)</label>
+      <div class="field-row"><input type="range" id="gevinstskatt" min="15" max="35" step="1" value="22"><span class="val" id="gevinstskatt-val"></span></div>
+    </div>
+    <div class="field">
+      <label>Eiendomsmegler ved salg (%)</label>
+      <div class="field-row"><input type="range" id="megler" min="1" max="4" step="0.1" value="2.5"><span class="val" id="megler-val"></span></div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label">Formue- og eiendomsskatt</div>
+    <div class="field">
+      <label>Formuesskattesats (%)</label>
+      <div class="field-row"><input type="range" id="formuesskatt" min="0" max="1.5" step="0.05" value="1.0"><span class="val" id="formuesskatt-val"></span></div>
+    </div>
+    <div class="infobox">ℹ Oslo: <span style="color:var(--accent)">0 % eiendomsskatt</span> på bolig (avviklet 2019).</div>
+    <div class="field">
+      <label>Kommunal eiendomsskatt (% av markedsverdi)</label>
+      <div class="field-row"><input type="range" id="eiendomsskatt" min="0" max="0.7" step="0.05" value="0"><span class="val" id="eiendomsskatt-val"></span></div>
+    </div>
+  </div>
+
+</aside>
+
+<main class="main" id="results"><!-- filled by JS --></main>
+</div>
+
+<script>
+const fmt = n => new Intl.NumberFormat('no-NO', {maximumFractionDigits:0}).format(Math.round(n)) + ' kr';
+const fmtM = n => (n/1e6).toFixed(2) + ' mill';
+const fmtPct = n => n.toFixed(1) + ' %';
+
+const sliders = ['verdi','gjeld','oppussing','kjøpspris','leie','leievekst','felles','fellesvekst','forsikring','uforutsett','kostnadsvekst','ledighet','rente','lopetid','opp-rente','opp-lopetid','alt1','alt2','alt3','prisvekst','inflasjon','skatt','gevinstskatt','megler','formuesskatt','eiendomsskatt','horisont'];
+
+let lånetype = 'annuitet';
+let oppussingJa = true;
+let oppFinansiering = 'kontant';
+
+function setOppussing(v) {
+  oppussingJa = v === 'ja';
+  document.getElementById('btn-opp-ja').classList.toggle('active', oppussingJa);
+  document.getElementById('btn-opp-nei').classList.toggle('active', !oppussingJa);
+  document.getElementById('opp-detaljer').style.display = oppussingJa ? '' : 'none';
+  calculate();
+}
+
+function setOppFinansiering(v) {
+  oppFinansiering = v;
+  document.getElementById('btn-opp-kontant').classList.toggle('active', v === 'kontant');
+  document.getElementById('btn-opp-lan').classList.toggle('active', v === 'lån');
+  document.getElementById('opp-lan-detaljer').style.display = v === 'lån' ? '' : 'none';
+  document.getElementById('opp-info-kontant').style.display = v === 'kontant' ? '' : 'none';
+  calculate();
+}
+let visReal = false;
+
+function setLånetype(type) {
+  lånetype = type;
+  document.getElementById('btn-annuitet').classList.toggle('active', type==='annuitet');
+  document.getElementById('btn-avdragsfri').classList.toggle('active', type==='avdragsfri');
+  document.getElementById('field-lopetid').style.opacity = type==='avdragsfri' ? '0.35' : '1';
+  calculate();
+}
+
+function setReal(v) {
+  visReal = v;
+  document.getElementById('btn-nominell').classList.toggle('active', !v);
+  document.getElementById('btn-real').classList.toggle('active', v);
+  document.getElementById('real-badge').classList.toggle('visible', v);
+  calculate();
+}
+
+function displayVal(id, v) {
+  const map = {
+    verdi: fmtM(v), gjeld: fmtM(v), oppussing: fmt(v), kjøpspris: fmtM(v),
+    leie: fmt(v)+'/mnd', leievekst: fmtPct(v),
+    felles: fmt(v)+'/mnd', fellesvekst: fmtPct(v),
+    forsikring: fmt(v)+'/år', uforutsett: fmtPct(v),
+    kostnadsvekst: fmtPct(v), ledighet: v+' mnd/år',
+    rente: fmtPct(v), alt1: fmtPct(v), alt2: fmtPct(v), alt3: fmtPct(v),
+    prisvekst: fmtPct(v), inflasjon: fmtPct(v),
+    skatt: fmtPct(v), gevinstskatt: fmtPct(v), megler: fmtPct(v),
+    formuesskatt: fmtPct(v), eiendomsskatt: fmtPct(v),
+    horisont: v+' år', lopetid: v+' år',
+    'opp-rente': fmtPct(v), 'opp-lopetid': v+' år',
+  };
+  document.getElementById(id+'-val').textContent = map[id];
+}
+
+function get(id) { return parseFloat(document.getElementById(id).value); }
+let chartInstance = null;
+
+function simBeholde(leieTest, params) {
+  const { V0, gjeld, oppussing, kjøpspris, felles, ledighetMnd, rente, prisvekst,
+          skattPct, gevinstskatt, meglerPct, formuesskattsats, eiendomsskattsats,
+          fellesvekst, leievekst, forsikring0, uforutsettPct, kostnadsvekst, år, lopetid,
+          oppLån, oppRente, oppLopetid, gjeldOpp } = params;
+
+  // Hovedlån (eksisterende gjeld)
+  const rMnd = rente / 12, nMnd = lopetid * 12;
+  const annTermHoved = lånetype === 'annuitet' && rMnd > 0
+    ? (gjeld * (rMnd * Math.pow(1+rMnd,nMnd)) / (Math.pow(1+rMnd,nMnd)-1)) * 12 : 0;
+
+  // Oppussingslån (eget annuitetslån hvis valgt)
+  const oppRenteMnd = oppRente / 12, oppNMnd = oppLopetid * 12;
+  const annTermOpp = oppLån && oppRenteMnd > 0 && gjeldOpp > 0
+    ? (gjeldOpp * (oppRenteMnd * Math.pow(1+oppRenteMnd,oppNMnd)) / (Math.pow(1+oppRenteMnd,oppNMnd)-1)) * 12 : 0;
+
+  let restHoved = gjeld - gjeldOpp; // eksisterende gjeld ekskl. oppussingslån
+  let restOpp = gjeldOpp;
+  let totalKontantflyt = 0;
+  const kontantflytArr = [];
+  const restgjeldArr = [gjeld]; // total startgjeld
+
+  for (let y = 1; y <= år; y++) {
+    // Hovedlån
+    const renteHovedY = restHoved * rente;
+    let avdragHovedY = 0;
+    if (lånetype === 'annuitet') avdragHovedY = Math.max(0, annTermHoved - renteHovedY);
+    restHoved = Math.max(0, restHoved - avdragHovedY);
+
+    // Oppussingslån
+    let renteOppY = 0, avdragOppY = 0;
+    if (oppLån && restOpp > 0) {
+      renteOppY = restOpp * oppRente;
+      avdragOppY = Math.max(0, annTermOpp - renteOppY);
+      restOpp = Math.max(0, restOpp - avdragOppY);
+    }
+
+    const restgjeldTotal = restHoved + restOpp;
+    restgjeldArr.push(restgjeldTotal);
+
+    const VyBolig = (V0 + oppussing * 0.5) * Math.pow(1 + prisvekst, y);
+    const bruttoleieÅrY = leieTest * (12 - ledighetMnd) * Math.pow(1 + leievekst, y - 1);
+    const fellesÅrY = felles * 12 * Math.pow(1 + fellesvekst, y - 1);
+
+    // Begge renter er fradragsberettiget mot leieinntekt
+    const totalRenteY = renteHovedY + renteOppY;
+    const nettoleieForSkatt = bruttoleieÅrY - fellesÅrY - totalRenteY;
+    const skattKrY = Math.max(0, nettoleieForSkatt * skattPct);
+    const nettoleieEtterSkattY = nettoleieForSkatt - skattKrY;
+
+    const uforutsettY = V0 * (uforutsettPct/100) * Math.pow(1 + kostnadsvekst, y - 1);
+    const forsikringY = forsikring0 * Math.pow(1 + kostnadsvekst, y - 1);
+    const formuesskattkrÅrY = Math.max(0, VyBolig - restgjeldTotal) * formuesskattsats;
+    const eiendomsskattkrÅrY = VyBolig * eiendomsskattsats;
+
+    const kf = nettoleieEtterSkattY - avdragHovedY - avdragOppY
+               - uforutsettY - forsikringY - formuesskattkrÅrY - eiendomsskattkrÅrY;
+    kontantflytArr.push(kf);
+    totalKontantflyt += kf;
+  }
+
+  const restgjeldSlutt = restHoved + restOpp;
+  const VN = (V0 + oppussing * 0.5) * Math.pow(1 + prisvekst, år);
+  const meglerKostnadN = VN * meglerPct;
+  const salgssumNettoN = VN - meglerKostnadN;
+  const gevinstN = Math.max(0, salgssumNettoN - kjøpspris - oppussing);
+  const gevinstSkattN = gevinstN * gevinstskatt;
+  const salgsProveny = salgssumNettoN - restgjeldSlutt - gevinstSkattN;
+
+  return {
+    total: totalKontantflyt + salgsProveny,
+    kontantflytArr, restgjeldArr,
+    VN, meglerKostnadN, gevinstSkattN,
+    salgsProveny, totalKontantflyt,
+    restgjeldSlutt
+  };
+}
+
+function beregnMålleie(friKapital, altRente, altType, params) {
+  // Beregn etter-skatt sluttverdi for alternativet
+  const SKATT_RENTE  = 0.22;
+  const SKATT_ASK    = 0.22;
+  const SKATT_AKSJER = 0.22 * 1.72;
+  let altEtterSkatt;
+  if (altType === 'bank') {
+    altEtterSkatt = friKapital * Math.pow(1 + altRente * (1 - SKATT_RENTE), params.år);
+  } else if (altType === 'ask') {
+    const brutto = friKapital * Math.pow(1 + altRente, params.år);
+    altEtterSkatt = brutto - Math.max(0, brutto - friKapital) * SKATT_ASK;
+  } else { // aksjer
+    const brutto = friKapital * Math.pow(1 + altRente, params.år);
+    altEtterSkatt = brutto - Math.max(0, brutto - friKapital) * SKATT_AKSJER;
+  }
+  const målTotal = altEtterSkatt * 1.10;
+  let lo = 1000, hi = 150000;
+  for (let i = 0; i < 64; i++) {
+    const mid = (lo + hi) / 2;
+    if (simBeholde(mid, params).total < målTotal) lo = mid;
+    else hi = mid;
+  }
+  return Math.round((lo + hi) / 2);
+}
+
+function deflater(val, år, inflasjon) {
+  return visReal ? val / Math.pow(1 + inflasjon, år) : val;
+}
+
+function calculate() {
+  const V0 = get('verdi'), gjeld = get('gjeld');
+  const kjøpspris = get('kjøpspris');
+
+  // Oppussing-logikk
+  const oppussing     = oppussingJa ? get('oppussing') : 0;
+  const oppLån        = oppussingJa && oppFinansiering === 'lån';
+  const oppKontant    = oppussingJa && oppFinansiering === 'kontant';
+  const oppRente      = get('opp-rente') / 100;
+  const oppLopetid    = get('opp-lopetid');
+  // Oppussingslån: egen gjeld som starter år 0
+  const gjeldOpp      = oppLån ? oppussing : 0;
+  // Total startgjeld i simuleringen
+  const gjeldTotal    = gjeld + gjeldOpp;
+  const leie = get('leie'), leievekst = get('leievekst')/100;
+  const felles = get('felles'), fellesvekst = get('fellesvekst')/100;
+  const forsikring0 = get('forsikring');
+  const uforutsettPct = get('uforutsett');
+  const kostnadsvekst = get('kostnadsvekst')/100;
+  const ledighetMnd = get('ledighet');
+  const rente = get('rente')/100;
+  const alt1 = get('alt1')/100, alt2 = get('alt2')/100, alt3 = get('alt3')/100;
+  const prisvekst = get('prisvekst')/100;
+  const inflasjon = get('inflasjon')/100;
+  const skattPct = get('skatt')/100;
+  const gevinstskatt = get('gevinstskatt')/100;
+  const meglerPct = get('megler')/100;
+  const formuesskattsats = get('formuesskatt')/100;
+  const eiendomsskattsats = get('eiendomsskatt')/100;
+  const år = get('horisont');
+  const lopetid = get('lopetid');
+
+  const params = { V0, gjeld: gjeldTotal, oppussing, kjøpspris, felles, ledighetMnd,
+    rente, prisvekst, skattPct, gevinstskatt, meglerPct, formuesskattsats, eiendomsskattsats,
+    fellesvekst, leievekst, forsikring0, uforutsettPct, kostnadsvekst, år, lopetid,
+    oppLån, oppRente, oppLopetid, gjeldOpp };
+
+  // ---- SELGE NÅ ----
+  const meglerKostnad = V0 * meglerPct;
+  const salgssumNetto = V0 - meglerKostnad;
+  const skattepliktigGevinst = Math.max(0, salgssumNetto - kjøpspris - oppussing);
+  const gevinstSkattKr = skattepliktigGevinst * gevinstskatt;
+  // Fri kapital: trekk fra eksisterende gjeld (ikke oppussingslån — det finnes ikke ved salg nå)
+  // Ved kontant oppussing: beløpet trekkes fra disponibel kapital
+  const friKapital = salgssumNetto - gjeld - gevinstSkattKr - (oppKontant ? oppussing : 0);
+
+  // ---- ALTERNATIVE PLASSERINGER ETTER SKATT ----
+  // Skattesatser (konstante, 2025-regler):
+  const SKATT_RENTE    = 0.22;          // bank: løpende skatt på renter
+  const SKATT_ASK      = 0.22;          // indeksfond via ASK: 22% på gevinst ved uttak
+  const SKATT_AKSJER   = 0.22 * 1.72;  // direkte aksjer: oppjustering 1,72 → 37,84%
+
+  // Bank: renter skattlegges løpende hvert år
+  const alt1NettoRente = alt1 * (1 - SKATT_RENTE);
+  const altVerdi1 = friKapital * Math.pow(1 + alt1NettoRente, år);
+
+  // Indeksfond ASK: vokser brutto, skatt på gevinst (kapital friholdes) ved uttak
+  const altVerdi2Brutto = friKapital * Math.pow(1 + alt2, år);
+  const altVerdi2Gevinst = Math.max(0, altVerdi2Brutto - friKapital);
+  const altVerdi2 = altVerdi2Brutto - altVerdi2Gevinst * SKATT_ASK;
+
+  // Oslo Børs / aksjer: vokser brutto, oppjustert gevinstskatt ved uttak
+  const altVerdi3Brutto = friKapital * Math.pow(1 + alt3, år);
+  const altVerdi3Gevinst = Math.max(0, altVerdi3Brutto - friKapital);
+  const altVerdi3 = altVerdi3Brutto - altVerdi3Gevinst * SKATT_AKSJER;
+
+  // Skatt betalt på alternativene (for visning)
+  const skattBank   = friKapital * (Math.pow(1+alt1,år) - Math.pow(1+alt1NettoRente,år));
+  const skattASK    = altVerdi2Gevinst * SKATT_ASK;
+  const skattAksjer = altVerdi3Gevinst * SKATT_AKSJER;
+
+  // ---- BEHOLDE ----
+  const sim = simBeholde(leie, params);
+  const { kontantflytArr, restgjeldArr, VN, meglerKostnadN, gevinstSkattN,
+          salgsProveny, totalKontantflyt, restgjeldSlutt } = sim;
+
+  const totalBeholde = sim.total;
+
+  // Realverdi-faktor for sluttverdi
+  const defN = visReal ? Math.pow(1 + inflasjon, år) : 1;
+
+  const totalBeholdeVis = deflater(totalBeholde, år, inflasjon);
+  const altVerdi1Vis = deflater(altVerdi1, år, inflasjon);
+  const altVerdi2Vis = deflater(altVerdi2, år, inflasjon);
+  const altVerdi3Vis = deflater(altVerdi3, år, inflasjon);
+
+  // Beste alternativ (for verdict)
+  const besteAlt = Math.max(altVerdi1, altVerdi2, altVerdi3);
+  const differanse = totalBeholde - besteAlt;
+  const beholdeVinner = differanse > 0;
+  const verdictClass = Math.abs(differanse) < 500000 ? 'neutral' : (beholdeVinner ? 'beholde' : 'selge');
+  const verdictTittel = Math.abs(differanse) < 300000 ? '≈ Tilnærmet likt' : (beholdeVinner ? 'Beholde anbefales' : 'Selge anbefales');
+  const verdictFarge = Math.abs(differanse) < 300000 ? 'neutral' : (beholdeVinner ? 'green' : 'red');
+
+  // År 1 kontantflyt for display
+  const kf1 = kontantflytArr[0] || 0;
+  const kfClass = kf1 >= 0 ? 'pos' : 'neg';
+
+  // År 1 display
+  const bruttoleieÅr1 = leie * (12 - ledighetMnd);
+  const fellesÅr1 = felles * 12;
+  const renteÅr1 = (gjeld - gjeldOpp) * rente;
+  const renteOppÅr1 = oppLån ? gjeldOpp * oppRente : 0;
+  const totalRenteÅr1 = renteÅr1 + renteOppÅr1;
+  const rMnd = rente / 12, nMnd = lopetid * 12;
+  const annuitetTermÅr = lånetype === 'annuitet' && rMnd > 0
+    ? (( gjeld - gjeldOpp) * (rMnd * Math.pow(1+rMnd,nMnd)) / (Math.pow(1+rMnd,nMnd)-1)) * 12 : 0;
+  const avdragÅr1 = lånetype === 'annuitet' ? Math.max(0, annuitetTermÅr - renteÅr1) : 0;
+  const oppRenteMnd = oppRente / 12, oppNMnd = oppLopetid * 12;
+  const annTermOpp1 = oppLån && oppRenteMnd > 0 && gjeldOpp > 0
+    ? (gjeldOpp * (oppRenteMnd * Math.pow(1+oppRenteMnd,oppNMnd)) / (Math.pow(1+oppRenteMnd,oppNMnd)-1)) * 12 : 0;
+  const avdragOppÅr1 = oppLån ? Math.max(0, annTermOpp1 - renteOppÅr1) : 0;
+  const nettoleieForSkatt1 = bruttoleieÅr1 - fellesÅr1 - totalRenteÅr1;
+  const skattKr1 = Math.max(0, nettoleieForSkatt1 * skattPct);
+  const uforutsettÅr1 = V0 * (uforutsettPct/100);
+  const VBolig1 = (V0 + oppussing * 0.5) * Math.pow(1 + prisvekst, 1);
+  const formuesskattkrÅr1 = Math.max(0, VBolig1 - gjeldTotal + avdragÅr1 + avdragOppÅr1) * formuesskattsats;
+  const eiendomsskattkrÅr1 = VBolig1 * eiendomsskattsats;
+  const yield_brutto = (bruttoleieÅr1 / (V0 + oppussing)) * 100;
+
+  // Målleier
+  const ml1 = beregnMålleie(friKapital, alt1, 'bank', params);
+  const ml2 = beregnMålleie(friKapital, alt2, 'ask', params);
+  const ml3 = beregnMålleie(friKapital, alt3, 'aksjer', params);
+
+  const realLabel = visReal ? ` (real, ${fmtPct(get('inflasjon'))} inflasjon)` : ' (nominelt)';
+
+  const html = `
+    <div class="real-toggle-wrap">
+      <span class="real-toggle-label">Visning:</span>
+      <div style="display:flex;gap:6px;">
+        <button class="toggle-btn ${!visReal?'active':''}" id="btn-nominell" onclick="setReal(false)">Nominell</button>
+        <button class="toggle-btn ${visReal?'active':''}" id="btn-real" onclick="setReal(true)">Real</button>
+      </div>
+      <span class="real-badge ${visReal?'visible':''}" id="real-badge">Justert for inflasjon</span>
+    </div>
+
+    <div class="verdict ${verdictClass}">
+      <div class="verdict-label">Anbefaling over ${år} år · ${oppussingJa ? (oppLån ? `Oppussing lån ${fmtPct(get('opp-rente'))} / ${get('opp-lopetid')} år` : 'Oppussing kontant') : 'Ingen oppussing'}</div>
+      <div class="verdict-title ${verdictFarge}">${verdictTittel}</div>
+      <div class="verdict-sub">
+        Differanse mot beste alternativ: <strong>${fmt(Math.abs(differanse))}</strong>${visReal ? ' (nominelt)' : ''}
+        ${kf1 < 0 ? '<br>⚠ Negativ kontantflyt år 1 — boligen koster deg penger løpende.' : ''}
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-label">Kontantflyt år 1</div>
+        <div class="card-value ${kfClass}">${fmt(kf1)}</div>
+        <div class="card-sub">${fmt(kf1/12)} / mnd</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Brutto yield</div>
+        <div class="card-value">${yield_brutto.toFixed(2)} %</div>
+        <div class="card-sub">av (verdi + oppussing)</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Beholde — total${realLabel}</div>
+        <div class="card-value green">${fmtM(totalBeholdeVis)}</div>
+        <div class="card-sub">Kontantflyt + salgsproveny</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Fri kapital ved salg nå</div>
+        <div class="card-value">${fmtM(friKapital)}</div>
+        <div class="card-sub">Etter gjeld, megler, gevinstskatt</div>
+      </div>
+    </div>
+
+    <div class="breakdown">
+      <div class="breakdown-header">Alternative plasseringer — sluttverdi etter ${år} år${realLabel}</div>
+      <table>
+        <tr><td>Bankinnskudd brutto (${fmtPct(get('alt1'))})</td><td>${fmtM(deflater(friKapital * Math.pow(1+alt1,år), år, inflasjon))}</td></tr>
+        <tr><td style="padding-left:26px;color:#8a8078;font-size:12px">→ Skatt 22% på renter løpende</td><td style="color:var(--red);font-family:'IBM Plex Mono',monospace;font-size:12px;text-align:right">− ${fmtM(deflater(skattBank, år, inflasjon))}</td></tr>
+        <tr><td><strong>Bankinnskudd etter skatt</strong></td><td class="${totalBeholde > altVerdi1 ? 'pos' : 'neg'}">${fmtM(deflater(altVerdi1, år, inflasjon))}</td></tr>
+        <tr style="border-top:1px solid #e0d9ce"><td>Indeksfond ASK brutto (${fmtPct(get('alt2'))})</td><td>${fmtM(deflater(altVerdi2Brutto, år, inflasjon))}</td></tr>
+        <tr><td style="padding-left:26px;color:#8a8078;font-size:12px">→ Skatt 22% på gevinst ved uttak (ASK)</td><td style="color:var(--red);font-family:'IBM Plex Mono',monospace;font-size:12px;text-align:right">− ${fmtM(deflater(skattASK, år, inflasjon))}</td></tr>
+        <tr><td><strong>Indeksfond etter skatt</strong></td><td class="${totalBeholde > altVerdi2 ? 'pos' : 'neg'}">${fmtM(deflater(altVerdi2, år, inflasjon))}</td></tr>
+        <tr style="border-top:1px solid #e0d9ce"><td>Oslo Børs / aksjer brutto (${fmtPct(get('alt3'))})</td><td>${fmtM(deflater(altVerdi3Brutto, år, inflasjon))}</td></tr>
+        <tr><td style="padding-left:26px;color:#8a8078;font-size:12px">→ Skatt 37,84% på gevinst (22% × 1,72 oppjustering)</td><td style="color:var(--red);font-family:'IBM Plex Mono',monospace;font-size:12px;text-align:right">− ${fmtM(deflater(skattAksjer, år, inflasjon))}</td></tr>
+        <tr><td><strong>Oslo Børs etter skatt</strong></td><td class="${totalBeholde > altVerdi3 ? 'pos' : 'neg'}">${fmtM(deflater(altVerdi3, år, inflasjon))}</td></tr>
+        <tr class="total"><td>Beholde boligen</td><td>${fmtM(totalBeholdeVis)}</td></tr>
+      </table>
+      <div style="padding:10px 18px;font-size:11px;color:#8a8078;font-family:'IBM Plex Mono',monospace;border-top:1px solid #e0d9ce;">
+        Skattesatser per 2025-regler. Bank: 22% løpende. ASK-fond: 22% på gevinst ved uttak. Aksjer utenfor ASK: 22% × 1,72 oppjusteringsfaktor = 37,84%. Disse kan endres ved fremtidige budsjetter.
+      </div>
+    </div>
+
+    <div class="breakdown">
+      <div class="breakdown-header">År 1 — Kontantflyt detaljert</div>
+      <table>
+        <tr><td>Brutto leieinntekter år 1 (+ ${fmtPct(get('leievekst'))}/år)</td><td class="pos">+ ${fmt(bruttoleieÅr1)}</td></tr>
+        <tr><td>Felleskostnader år 1 (+ ${fmtPct(get('fellesvekst'))}/år)</td><td class="neg">− ${fmt(fellesÅr1)}</td></tr>
+        <tr><td>Rentekostnad hovedlån år 1 <span style="color:#8a8078;font-size:11px">(fradrag)</span></td><td class="neg">− ${fmt(renteÅr1)}</td></tr>
+        ${oppLån ? `<tr><td>Rentekostnad oppussingslån år 1 <span style="color:#8a8078;font-size:11px">(fradrag)</span></td><td class="neg">− ${fmt(renteOppÅr1)}</td></tr>` : ''}
+        <tr><td style="padding-left:26px;color:#8a8078;font-size:12px">→ Skattepliktig netto</td><td style="color:#8a8078;font-size:11px;text-align:right">${fmt(Math.max(0, nettoleieForSkatt1))}</td></tr>
+        <tr><td>Skatt ${fmtPct(get('skatt'))} av skattepliktig netto</td><td class="neg">− ${fmt(skattKr1)}</td></tr>
+        ${lånetype === 'annuitet'
+          ? `<tr><td>Avdrag hovedlån år 1 <span style="color:#8a8078;font-size:11px">(bygger EK)</span></td><td class="neg">− ${fmt(avdragÅr1)}</td></tr>`
+          : `<tr><td style="color:#8a8078">Avdrag hovedlån</td><td style="color:#8a8078">— avdragsfritt</td></tr>`}
+        ${oppLån ? `<tr><td>Avdrag oppussingslån år 1 <span style="color:#8a8078;font-size:11px">(bygger EK)</span></td><td class="neg">− ${fmt(avdragOppÅr1)}</td></tr>` : ''}
+        ${oppKontant && oppussing > 0 ? `<tr><td>Oppussing kontant <span style="color:#8a8078;font-size:11px">(engangsutlegg, reduserer alternativ plassering)</span></td><td class="neg">− ${fmt(oppussing)}</td></tr>` : ''}
+        <tr><td>Forsikring utleiebolig</td><td class="neg">− ${fmt(forsikring0)}</td></tr>
+        <tr><td>Uforutsette kostnader (${fmtPct(uforutsettPct)} av verdi, + ${fmtPct(get('kostnadsvekst'))}/år)</td><td class="neg">− ${fmt(uforutsettÅr1)}</td></tr>
+        <tr><td>Formuesskatt (${fmtPct(get('formuesskatt'))} × netto boligformue, år 1)</td><td class="neg">− ${fmt(formuesskattkrÅr1)}</td></tr>
+        <tr><td>Eiendomsskatt (${fmtPct(get('eiendomsskatt'))} av verdi)</td><td class="${eiendomsskattkrÅr1 > 0 ? 'neg' : 'muted'}">− ${fmt(eiendomsskattkrÅr1)}</td></tr>
+        <tr class="subtotal"><td>Netto kontantflyt år 1</td><td class="${kfClass}">${fmt(kf1)}</td></tr>
+        <tr><td>Akkumulert kontantflyt × ${år} år</td><td>${fmt(totalKontantflyt)}</td></tr>
+        <tr><td>Boligverdi om ${år} år</td><td>${fmtM(VN)}</td></tr>
+        <tr><td>Meglerhonorar ved salg</td><td class="neg">− ${fmt(meglerKostnadN)}</td></tr>
+        <tr><td>Gjenstående gjeld om ${år} år</td><td class="neg">− ${fmt(restgjeldSlutt)}</td></tr>
+        <tr><td>Gevinst (salgssum − kjøpspris − oppussing)</td><td>${fmt(Math.max(0, VN*(1-meglerPct) - kjøpspris - oppussing))}</td></tr>
+        <tr><td>Gevinstskatt ved salg (${fmtPct(get('gevinstskatt'))})</td><td class="neg">− ${fmt(gevinstSkattN)}</td></tr>
+        <tr class="total"><td>Total formue — beholde (nominelt)</td><td>${fmtM(totalBeholde)}</td></tr>
+      </table>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Formuesutvikling over ${år} år${realLabel}</div>
+      <canvas id="myChart" height="240"></canvas>
+    </div>
+
+    <div class="målleie-wrap">
+      <div class="målleie-header">Lønnsom utleie — målleie per alternativ</div>
+      <div class="målleie-intro">Leie år 1 som gir <strong>10 % bedre</strong> totalresultat enn hvert alternativ over <strong>${år} år</strong>, med alle andre parametere uendret.</div>
+      ${[
+        { navn: 'Bankinnskudd', info: '22% skatt løpende', rente: get('alt1'), ml: ml1, color: 'var(--accent)' },
+        { navn: 'Indeksfond (ASK)', info: '22% på gevinst ved uttak', rente: get('alt2'), ml: ml2, color: 'var(--blue)' },
+        { navn: 'Oslo Børs / aksjer', info: '37,84% på gevinst (22%×1,72)', rente: get('alt3'), ml: ml3, color: 'var(--purple)' },
+      ].map(a => {
+        const diff = a.ml - leie;
+        const diffPct = (diff / leie * 100).toFixed(1);
+        return `
+        <div class="målleie-row">
+          <div>
+            <div class="ml-name">${a.navn}</div>
+            <div class="ml-rate">${fmtPct(a.rente)} · <span style="color:#8a8078">${a.info}</span></div>
+          </div>
+          <div class="ml-right">
+            <div class="ml-leie" style="color:${a.color}">${fmt(a.ml)}<span>/mnd</span></div>
+            <div class="ml-diff ${diff > 0 ? 'up' : 'ok'}">
+              ${diff > 0 ? `+${fmt(diff)} vs nåværende leie (+${diffPct}%)` : `✓ Nåværende leie er tilstrekkelig`}
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    ${(() => {
+      // ---- SENSITIVITETSANALYSE ----
+      const delta = 0.10; // 10% endring
+      const tests = [
+        { navn: 'Prisvekst bolig',       retning: '+', fn: p => ({ ...p, prisvekst: p.prisvekst * (1+delta) }) },
+        { navn: 'Månedlig leie',          retning: '+', fn: p => ({ ...p }), leieTest: leie * (1+delta) },
+        { navn: 'Alternativrente (fond)', retning: '−', altTest: altVerdi2 * (1+delta), higher: true },
+        { navn: 'Rente på lån',           retning: '−', fn: p => ({ ...p, rente: p.rente * (1+delta) }) },
+        { navn: 'Felleskostnader',        retning: '−', fn: p => ({ ...p, felles: p.felles * (1+delta) }) },
+        { navn: 'Investeringshorisont',   retning: '+', fn: p => ({ ...p, år: Math.min(30, p.år + 3) }) },
+        { navn: 'Gevinstskatt',           retning: '−', fn: p => ({ ...p, gevinstskatt: p.gevinstskatt * (1+delta) }) },
+        { navn: 'Formuesskatt',           retning: '−', fn: p => ({ ...p, formuesskattsats: p.formuesskattsats * (1+delta) }) },
+      ];
+
+      const sensitivitet = tests.map(t => {
+        let påvirkning;
+        if (t.altTest !== undefined) {
+          påvirkning = -(t.altTest - besteAlt); // høyere alternativ → dårligere for beholde
+        } else {
+          const pMod = t.fn(params);
+          const leieTestVal = t.leieTest || leie;
+          const nyTotal = simBeholde(leieTestVal, pMod).total;
+          påvirkning = nyTotal - totalBeholde;
+        }
+        return { ...t, påvirkning };
+      }).sort((a, b) => Math.abs(b.påvirkning) - Math.abs(a.påvirkning));
+
+      return `
+      <div class="sensitivitet-wrap">
+        <div class="sens-header">Hvilke parametere påvirker lønnsomheten mest?</div>
+        <div class="sens-intro">Effekt på totalresultat ved 10% endring i hver parameter, rangert etter størst utslag.</div>
+        ${sensitivitet.map((s, i) => {
+          const pos = s.påvirkning >= 0;
+          const bredde = Math.min(100, Math.abs(s.påvirkning) / Math.max(...sensitivitet.map(x => Math.abs(x.påvirkning))) * 100);
+          return `
+          <div class="sens-row">
+            <div class="sens-rank">${i+1}</div>
+            <div class="sens-body">
+              <div class="sens-name">${s.navn} <span class="sens-retning">(${s.retning} 10% → ${pos ? 'bedre' : 'svekker'} utleie)</span></div>
+              <div class="sens-bar-wrap">
+                <div class="sens-bar ${pos ? 'pos' : 'neg'}" style="width:${bredde}%"></div>
+              </div>
+            </div>
+            <div class="sens-val ${pos ? 'pos' : 'neg'}">${pos ? '+' : ''}${fmtM(s.påvirkning)}</div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    })()}
+
+    ${(() => {
+      // ---- PRIMÆRBOLIG-SCENARIO ----
+      const boutgifter = parseFloat(document.getElementById('boutgifter')?.value || 0);
+      const siste12Leie = leie * Math.pow(1 + leievekst, år - 1); // leienivå siste år
+      const tapLeie = siste12Leie * 12;
+      const spareBoutgifter = boutgifter * 12;
+      // Gevinstskatt spares (0 kr ved primærbolig)
+      const sparetGevinstskatt = gevinstSkattN;
+      const nettoPrimærbolig = totalBeholde - tapLeie + spareBoutgifter + sparetGevinstskatt;
+      const besteAltVal = Math.max(altVerdi1, altVerdi2, altVerdi3);
+      const primærDiff = nettoPrimærbolig - besteAltVal;
+      const primærVinner = primærDiff > 0;
+
+      return `
+      <div class="primær-wrap">
+        <div class="primær-header">Primærbolig-grep — bo i 12 mnd før salg</div>
+        <div class="primær-intro">
+          Hvis du bor i leiligheten i minst 12 av de siste 24 månedene før salg, er gevinsten <strong>skattefri</strong> (§9-3).
+          Du mister leieinntekt i 12 mnd, men sparer boutgifter du ellers ville hatt.
+        </div>
+        <div style="margin-bottom:16px;padding:12px 14px;background:#fbeeee;border:1px solid #e3bcbc;border-left:3px solid var(--red);border-radius:2px;font-size:11px;color:#7a3434;font-family:'IBM Plex Mono',monospace;line-height:1.8;">
+          ⚠ <strong style="color:#c06060;">Viktig:</strong> Skattefritaket forutsetter reell og faktisk bruk som primærbolig — ikke bare folkeregistrering på adressen. Skattemyndighetene foretar en konkret helhetsvurdering der faktiske boforhold tillegges avgjørende vekt: møbleringsgrad, strømforbruk, faktisk tilstedeværelse og om du har oppgitt annen bolig i perioden. Proforma-innflytting med sikte på å unngå gevinstbeskatning kan kvalifisere som skatteunndragelse og medføre tilleggsskatt. Rådgivning fra skatterådgiver eller advokat anbefales dersom du vurderer dette.
+        </div>
+        <div style="margin:14px 0 10px;">
+          <label style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);display:block;margin-bottom:6px;">
+            Dine nåværende månedlige boutgifter (husleie eller primærbolig-kostnader)
+          </label>
+          <input type="number" id="boutgifter" value="${boutgifter || 15000}"
+            style="background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:13px;padding:8px 12px;border-radius:2px;width:100%;outline:none;"
+            oninput="calculate()" placeholder="f.eks. 15000">
+        </div>
+        <table style="width:100%;border-collapse:collapse;margin-top:4px;">
+          <tr style="border-bottom:1px solid #e0d9ce;"><td style="padding:9px 0;font-size:13px;color:var(--muted);">Tapt leieinntekt (12 mnd, indeksert til år ${år})</td><td style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--red);">− ${fmt(tapLeie)}</td></tr>
+          <tr style="border-bottom:1px solid #e0d9ce;"><td style="padding:9px 0;font-size:13px;color:var(--muted);">Sparte boutgifter (12 mnd)</td><td style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--green);">+ ${fmt(spareBoutgifter)}</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:9px 0;font-size:13px;color:var(--muted);">Spart gevinstskatt (skattefritt salg)</td><td style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--green);">+ ${fmt(sparetGevinstskatt)}</td></tr>
+          <tr><td style="padding:12px 0;font-size:14px;font-weight:500;">Total formue med primærbolig-grep</td><td style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:500;color:${primærVinner ? 'var(--green)' : 'var(--accent)'};">${fmtM(nettoPrimærbolig)}</td></tr>
+        </table>
+        <div style="margin-top:12px;padding:12px 14px;background:${primærVinner ? '#eef6f0' : '#faf3e2'};border:1px solid ${primærVinner ? '#cfe6d6' : '#e0cfa8'};border-radius:2px;font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;">
+          ${primærVinner
+            ? `✓ Med primærbolig-grep slår utleie beste alternativ med <span style="color:var(--green)">${fmt(primærDiff)}</span>`
+            : `Beste alternativ er fortsatt ${fmt(Math.abs(primærDiff))} foran, selv med skattefritt salg`}
+          ${sparetGevinstskatt < 10000 ? '<br>ℹ Liten effekt her fordi beregnet gevinstskatt er lav.' : ''}
+        </div>
+      </div>`;
+    })()}
+
+    <div class="note">
+      ⚠ Avdrag er en reell kontantutbetaling men bygger egenkapital — ikke et tap.
+      Formuesskatt beregnes mot faktisk boligverdi (etter prisvekst) minus restgjeld hvert år.
+      Sekundærbolig: 100% formuesverdsettelse fra 2024. Oslo: 0% eiendomsskatt.
+      Uforutsette kostnader og forsikring indeksreguleres med kostnadsvekst.
+      Gevinstberegning er forenklet. Analysen er ikke skatterådgivning.
+      ${visReal ? `Real-visning deflaterer sluttverdi med ${fmtPct(get('inflasjon'))} inflasjon pr. år.` : ''}
+    </div>
+  `;
+
+  document.getElementById('results').innerHTML = html;
+  drawChart(friKapital, alt1, alt2, alt3, kontantflytArr, restgjeldArr, VN, meglerKostnadN, gevinstSkattN, år, prisvekst, V0, oppussing, meglerPct, gevinstskatt, inflasjon, kjøpspris);
+
+  // Lagre nøkkeltall til KalkulatorHub-broen (brukes av Frihetsplanen og forsiden)
+  if (window.KH) {
+    KH.save('bolig', {
+      månedligNettoKontantflyt: Math.round(kf1 / 12),
+      kontantflytÅr1: Math.round(kf1),
+      totalBeholde: Math.round(totalBeholde),
+      friKapitalVedSalg: Math.round(friKapital),
+      boligverdi: Math.round(V0),
+      gjeld: Math.round(gjeld),
+      månedligLeie: Math.round(leie),
+      investeringshorisont: år,
+      yieldBrutto: Math.round(yield_brutto * 100) / 100,
+    });
+  }
+}
+
+function drawChart(friKapital, alt1, alt2, alt3, kontantflytArr, restgjeldArr, VN, meglerKostnadN, gevinstSkattN, år, prisvekst, V0, oppussing, meglerPct, gevinstskatt, inflasjon, kjøpspris) {
+  const labels = ['År 0'];
+  const dBeholde = [], dAlt1 = [], dAlt2 = [], dAlt3 = [];
+
+  const startEK = V0 - restgjeldArr[0];
+  const def0 = visReal ? 1 : 1;
+  dBeholde.push(Math.round(startEK / 1000));
+  dAlt1.push(Math.round(friKapital / 1000));
+  dAlt2.push(Math.round(friKapital / 1000));
+  dAlt3.push(Math.round(friKapital / 1000));
+
+  let kfAkk = 0;
+  const SKATT_RENTE  = 0.22;
+  const SKATT_ASK    = 0.22;
+  const SKATT_AKSJER = 0.22 * 1.72;
+  const alt1NettoRente = alt1 * (1 - SKATT_RENTE);
+
+  for (let y = 1; y <= år; y++) {
+    labels.push('År ' + y);
+    kfAkk += kontantflytArr[y-1] || 0;
+    const Vy = (V0 + oppussing * 0.5) * Math.pow(1 + prisvekst, y);
+    const mY = Vy * meglerPct;
+    const gY = Math.max(0, Vy - mY - kjøpspris - oppussing) * gevinstskatt;
+    const gjeldY = restgjeldArr[Math.min(y, restgjeldArr.length-1)];
+    const bh = kfAkk + (Vy - mY - gjeldY - gY);
+    const defY = visReal ? Math.pow(1+inflasjon, y) : 1;
+
+    // Bank: løpende netto rente
+    const v1 = friKapital * Math.pow(1 + alt1NettoRente, y);
+
+    // ASK fond: brutto vekst, skatt på gevinst kun ved "salg" (vises som om solgt hvert år for graf)
+    const v2b = friKapital * Math.pow(1 + alt2, y);
+    const v2 = v2b - Math.max(0, v2b - friKapital) * SKATT_ASK;
+
+    // Aksjer: brutto vekst, oppjustert gevinstskatt
+    const v3b = friKapital * Math.pow(1 + alt3, y);
+    const v3 = v3b - Math.max(0, v3b - friKapital) * SKATT_AKSJER;
+
+    dBeholde.push(Math.round(bh / defY / 1000));
+    dAlt1.push(Math.round(v1 / defY / 1000));
+    dAlt2.push(Math.round(v2 / defY / 1000));
+    dAlt3.push(Math.round(v3 / defY / 1000));
+  }
+
+  if (!window.Chart) return;
+  if (chartInstance) chartInstance.destroy();
+  const ctx = document.getElementById('myChart').getContext('2d');
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Beholde', data: dBeholde, borderColor: '#7eb8a4', backgroundColor: 'rgba(126,184,164,0.07)', borderWidth: 2.5, pointRadius: 2, fill: true, tension: 0.3 },
+        { label: `Bank (${(alt1*100).toFixed(1)}%)`, data: dAlt1, borderColor: '#c8a96e', backgroundColor: 'transparent', borderWidth: 1.5, pointRadius: 1, borderDash: [4,4], tension: 0.3 },
+        { label: `Indeksfond (${(alt2*100).toFixed(1)}%)`, data: dAlt2, borderColor: '#6a9fc0', backgroundColor: 'transparent', borderWidth: 1.5, pointRadius: 1, borderDash: [6,3], tension: 0.3 },
+        { label: `Oslo Børs (${(alt3*100).toFixed(1)}%)`, data: dAlt3, borderColor: '#a07eb8', backgroundColor: 'transparent', borderWidth: 1.5, pointRadius: 1, borderDash: [2,4], tension: 0.3 },
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: '#8a8078', font: { family: 'IBM Plex Mono', size: 11 }, boxWidth: 20 } },
+        tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${new Intl.NumberFormat('no-NO').format(c.raw * 1000)} kr` } }
+      },
+      scales: {
+        x: { ticks: { color: '#8a8078', font: { size: 10, family: 'IBM Plex Mono' } }, grid: { color: '#e8e2d6' } },
+        y: { ticks: { color: '#8a8078', font: { size: 10, family: 'IBM Plex Mono' }, callback: v => (v<0?'−':'')+Math.abs(v/1000).toFixed(1)+' mill' }, grid: { color: '#e8e2d6' } }
+      }
+    }
+  });
+}
+
+const script = document.createElement('script');
+script.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+script.onload = () => { calculate(); };
+document.head.appendChild(script);
+
+sliders.forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  displayVal(id, parseFloat(el.value));
+  el.addEventListener('input', () => { displayVal(id, parseFloat(el.value)); calculate(); });
+});
+</script>
+</body>
+</html>
