@@ -32,6 +32,7 @@
       <span>Din plan</span>
     </div>
   </nav>
+  <button class="fp-nullstill-knapp" onclick="Steg.nullstill()">Nullstill og begynn på nytt</button>
 </header>
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -159,6 +160,30 @@
     Render.tegnSteg1();
     Render.tegnSteg2();
     Render.oppdaterNesteKnapp1();
+
+    // Last inn lagrede svar fra forrige besøk (punkt 1)
+    const lagtSteg = Steg.lastTilstand();
+    if (lagtSteg) {
+      // Re-render steg 1 og 2 med gjenopprettede verdier
+      Render.tegnSteg1();
+      Render.tegnSteg2();
+      Render.oppdaterNesteKnapp1();
+      // Gjenopprett steg-posisjon (men gå alltid tilbake til steg 1 hvis de
+      // var på steg 3/4, siden beregninger er session-spesifikke og ikke lagret)
+      const gjenopprettSteg = lagtSteg <= 2 ? lagtSteg : 1;
+      if (gjenopprettSteg > 1) Steg.gåTil(gjenopprettSteg);
+    }
+  });
+
+  // pageshow-lytter: trigges både ved vanlig sidelast OG når siden hentes
+  // fra nettleserens bfcache (frem/tilbake-navigering) — sikrer at
+  // import-bokser alltid viser ferske tall fra kalkulatorene (punkt 3)
+  window.addEventListener('pageshow', function(e) {
+    if (e.persisted) {
+      // Siden kom fra bfcache — re-render slik at import-bokser oppdateres
+      Render.tegnSteg2();
+      if (Steg.nåværende >= 3) Steg.oppdaterBeregning();
+    }
   });
 </script>
 

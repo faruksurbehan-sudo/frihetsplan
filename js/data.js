@@ -30,17 +30,46 @@ FP.KATEGORIER = [
       eier:  ['boligVerdi', 'boligLån', 'boligRente'],
       leier: ['husleieMnd'],
     },
+    // Ingen kalkulatorLenke her — bolig-kalkulatoren er kun relevant for separat utleiebolig
+    // og lenken vises i det underspørsmålet i stedet.
     underspørsmål: {
-      eier: {
-        id: 'harUtleiedel',
-        spørsmål: 'Har du en utleiedel i boligen?',
-        tilstander: [
-          { id: 'ja', label: 'Ja' },
-          { id: 'nei', label: 'Nei' },
-        ],
-        standardTilstand: 'nei',
-        felt: { ja: ['utleieinntektMnd'], nei: [] },
-      },
+      eier: [
+        {
+          id: 'harUtleiedel',
+          spørsmål: 'Har du en utleiedel i boligen?',
+          info: 'For å leie ut skattefritt må du eie boligen, bo der selv, og den utleide delen må utgjøre mindre enn halvparten av boligens areal. Oppgi netto månedsinntekt etter at du selv har vurdert skattemessig behandling.',
+          tilstander: [
+            { id: 'ja',  label: 'Ja' },
+            { id: 'nei', label: 'Nei' },
+          ],
+          standardTilstand: 'nei',
+          felt: { ja: ['utleiedelsInntektMnd'], nei: [] },
+        },
+        {
+          id: 'harUtleiebolig',
+          spørsmål: 'Har du en separat utleiebolig?',
+          tilstander: [
+            { id: 'ja',  label: 'Ja' },
+            { id: 'nei', label: 'Nei' },
+          ],
+          standardTilstand: 'nei',
+          felt: { ja: ['utleieinntektMnd'], nei: [] },
+          kalkulatorLenke: { url: '../kalkulatorer/utleiebolig.html', tekst: 'Åpne bolig-kalkulatoren for nøyaktige tall →' },
+        },
+      ],
+      leier: [
+        {
+          id: 'harUtleiebolig',
+          spørsmål: 'Har du en separat utleiebolig?',
+          tilstander: [
+            { id: 'ja',  label: 'Ja' },
+            { id: 'nei', label: 'Nei' },
+          ],
+          standardTilstand: 'nei',
+          felt: { ja: ['utleieinntektMnd'], nei: [] },
+          kalkulatorLenke: { url: '../kalkulatorer/utleiebolig.html', tekst: 'Åpne bolig-kalkulatoren for nøyaktige tall →' },
+        },
+      ],
     },
   },
   {
@@ -241,7 +270,7 @@ FP.FELT = {
     enhet: 'kr',
   },
   boligLån: {
-    label: (v) => (v.antallVoksne || 1) >= 2 ? 'Boliglån (din andel)' : 'Boliglån',
+    label: 'Boliglån (din andel)',
     min: 0, max: 10000000, step: 100000, standard: 3000000,
     enhet: 'kr',
   },
@@ -251,13 +280,19 @@ FP.FELT = {
     enhet: '%',
   },
   husleieMnd: {
-    label: (v) => (v.antallVoksne || 1) >= 2 ? 'Husleie (din andel)' : 'Husleie',
+    label: 'Husleie (din andel)',
     min: 5000, max: 30000, step: 500, standard: 12000,
     enhet: 'kr/mnd',
   },
+  utleiedelsInntektMnd: {
+    label: 'Netto leieinntekt fra utleiedel (din andel)',
+    min: 0, max: 20000, step: 500, standard: 5000,
+    enhet: 'kr/mnd',
+    info: 'Oppgi beløpet du faktisk sitter igjen med etter eventuelle kostnader. Frihetsplanen antar dette er netto.',
+  },
   utleieinntektMnd: {
-    label: 'Leieinntekt fra utleiedel',
-    min: 0, max: 20000, step: 500, standard: 8000,
+    label: 'Netto leieinntekt fra utleiebolig',
+    min: 0, max: 40000, step: 500, standard: 8000,
     enhet: 'kr/mnd',
     import: {
       kalkulator: 'bolig',

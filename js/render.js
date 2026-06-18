@@ -155,9 +155,13 @@ Render.tegnKategori = function(kat) {
   const feltHtml = feltIder.map(id => Render.feltRad(id, FP.FELT[id])).join('');
 
   // Underspørsmål for valgt tilstand (rekursivt samme mønster)
+  // Underspørsmål — støtter nå en liste (array) per tilstand,
+  // slik at f.eks. bolig/eier kan ha både "utleiedel" og "separat utleiebolig"
   let underspørsmålHtml = '';
-  const us = kat.underspørsmål && kat.underspørsmål[tilstand];
-  if (us) {
+  const usRaw = kat.underspørsmål && kat.underspørsmål[tilstand];
+  const usList = usRaw ? (Array.isArray(usRaw) ? usRaw : [usRaw]) : [];
+
+  usList.forEach(us => {
     const usTilstand = Steg.hentUnderspørsmålTilstand(us.id, us.standardTilstand);
     const usBryterHtml = '<div class="fp-bryter-gruppe fp-bryter-liten">'
       + us.tilstander.map(t => '<button class="fp-bryter' + (usTilstand === t.id ? ' aktiv' : '') + '" '
@@ -167,12 +171,25 @@ Render.tegnKategori = function(kat) {
     const usFeltIder = (us.felt && us.felt[usTilstand]) || [];
     const usFeltHtml = usFeltIder.map(id => Render.feltRad(id, FP.FELT[id])).join('');
 
-    underspørsmålHtml = '<div class="fp-underspørsmål">'
+    // Kalkulatorlenke per underspørsmål (kun for separat utleiebolig, ikke utleiedel)
+    const usKalkLenke = (us.kalkulatorLenke && usTilstand === 'ja')
+      ? '<a href="' + us.kalkulatorLenke.url + '" class="fp-kategori-kalkulator-lenke">'
+        + us.kalkulatorLenke.tekst + '</a>'
+      : '';
+
+    // Valgfri infobox per underspørsmål
+    const usInfoHtml = us.info
+      ? '<div class="fp-felt-info" style="margin-bottom:10px;">' + us.info + '</div>'
+      : '';
+
+    underspørsmålHtml += '<div class="fp-underspørsmål">'
       + '<div class="fp-underspørsmål-tekst">' + us.spørsmål + '</div>'
       + usBryterHtml
+      + usInfoHtml
       + usFeltHtml
+      + usKalkLenke
       + '</div>';
-  }
+  });
 
   return '<div class="fp-seksjon fp-kategori">'
     + '<div class="fp-seksjon-header">'

@@ -77,8 +77,12 @@ Beregn.kjør = function(v, valgteMål) {
     boligKostMnd = v.husleieMnd || 0;
   }
 
-  // Utleiedel reduserer netto boligkostnad
-  const utleieinntektMnd = (v.boligTilstand === 'eier' && v.harUtleiedel === 'ja')
+  // Utleiedel i primærboligen (kun eiere, kobles fra bolig-kalkulatoren)
+  const utleiedelsInntektMnd = (v.boligTilstand === 'eier' && v.harUtleiedel === 'ja')
+    ? (v.utleiedelsInntektMnd || 0) : 0;
+
+  // Separat utleiebolig (både eiere og leiere kan ha dette)
+  const utleieinntektMnd = v.harUtleiebolig === 'ja'
     ? (v.utleieinntektMnd || 0) : 0;
 
   // ── Transport: forgrenet på transportTilstand + finansiering ──
@@ -159,6 +163,7 @@ Beregn.kjør = function(v, valgteMål) {
   // ── Ledig kapital (månedlig) ──
   const fasterKostMnd = boligKostMnd
     - utleieinntektMnd
+    - utleiedelsInntektMnd
     + transportKostMnd
     + v.fritidMnd
     + v.restaurantMnd
@@ -191,6 +196,7 @@ Beregn.kjør = function(v, valgteMål) {
   return {
     nettoMndInntekt, fasterKostMnd, ledigMnd, totalSparingMnd,
     matKostMnd, antallVoksne, antallBarn,
+    utleieinntektMnd, utleiedelsInntektMnd,
 
     boligTermÅr, boligRenteÅr, boligAvdragÅr,
     refinansSparingMnd, refinansOver10år, refinansIFond,

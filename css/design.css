@@ -53,6 +53,23 @@ body {
   top: 0;
   z-index: 100;
 }
+.fp-nullstill-knapp {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.fp-nullstill-knapp:hover {
+  color: #c06060;
+  border-color: #c06060;
+}
 .fp-logo {
   font-family: var(--font-display);
   font-size: 22px;

@@ -47,6 +47,7 @@ const Steg = {
     } else {
       Steg.tilstand.valgteMål.push({ id });
     }
+    Steg.lagreTilstand();
     Render.oppdaterMålvalg();
     Render.oppdaterNesteKnapp1();
   },
@@ -58,12 +59,14 @@ const Steg = {
   oppdaterMålFelt: function(id, felt, verdi) {
     const mål = Steg.tilstand.valgteMål.find(m => m.id === id);
     if (mål) mål[felt] = verdi;
+    Steg.lagreTilstand();
   },
 
   // ─── KATEGORI-HÅNDTERING (generisk for bolig, transport, vaner osv.) ─────
 
   settKategoriTilstand: function(katId, tilstandId) {
     Steg.tilstand.kategorier[katId] = tilstandId;
+    Steg.lagreTilstand();
     Render.tegnSteg2(); // re-render hele steg 2 siden synlige felt endres
   },
 
@@ -74,6 +77,7 @@ const Steg = {
 
   settUnderspørsmålTilstand: function(usId, tilstandId) {
     Steg.tilstand.underspørsmål[usId] = tilstandId;
+    Steg.lagreTilstand();
     Render.tegnSteg2();
   },
 
@@ -85,6 +89,7 @@ const Steg = {
 
   settVerdi: function(id, verdi) {
     Steg.tilstand.verdier[id] = verdi;
+    Steg.lagreTilstand();
   },
 
   hentVerdi: function(id) {
@@ -105,12 +110,13 @@ const Steg = {
       const tilstand = Steg.hentKategoriTilstand(kat.id);
       v[kat.id + 'Tilstand'] = tilstand;
 
-      // Underspørsmål for denne tilstanden
-      const us = kat.underspørsmål && kat.underspørsmål[tilstand];
-      if (us) {
+      // Underspørsmål — støtter nå både enkelt objekt og liste
+      const usRaw = kat.underspørsmål && kat.underspørsmål[tilstand];
+      const usList = usRaw ? (Array.isArray(usRaw) ? usRaw : [usRaw]) : [];
+      usList.forEach(us => {
         const usTilstand = Steg.hentUnderspørsmålTilstand(us.id, us.standardTilstand);
         v[us.id] = usTilstand;
-      }
+      });
     });
 
     return v;
@@ -123,6 +129,59 @@ const Steg = {
     Steg.tilstand.resultat = Beregn.kjør(v, Steg.tilstand.valgteMål);
     if (Steg.nåværende === 3) Render.tegnSteg3(Steg.tilstand.resultat, v);
     if (Steg.nåværende === 4) Render.tegnSteg4(Steg.tilstand.resultat, v);
+  },
+
+  // ─── LAGRING AV BRUKERENS EGNE SVAR (localStorage) ──────────────────────
+  // Frihetsplanens egne svar lagres kontinuerlig slik at ingenting nullstilles
+  // ved frem/tilbake-navigering i nettleseren eller en utilsiktet sideoppdatering.
+
+  LAGRE_NØKKEL: 'fp_svar_v1',
+
+  lagreTilstand: function() {
+    try {
+      const snapshot = {
+        valgteMål: Steg.tilstand.valgteMål,
+        verdier:   Steg.tilstand.verdier,
+        kategorier: Steg.tilstand.kategorier,
+        underspørsmål: Steg.tilstand.underspørsmål,
+        nåværende: Steg.nåværende,
+      };
+      localStorage.setItem(Steg.LAGRE_NØKKEL, JSON.stringify(snapshot));
+    } catch(e) { /* localStorage kan være blokkert i private vinduer */ }
+  },
+
+  lastTilstand: function() {
+    try {
+      const raw = localStorage.getItem(Steg.LAGRE_NØKKEL);
+      if (!raw) return false;
+      const snapshot = JSON.parse(raw);
+      if (snapshot.valgteMål)    Steg.tilstand.valgteMål    = snapshot.valgteMål;
+      if (snapshot.verdier)      Steg.tilstand.verdier      = snapshot.verdier;
+      if (snapshot.kategorier)   Steg.tilstand.kategorier   = snapshot.kategorier;
+      if (snapshot.underspørsmål) Steg.tilstand.underspørsmål = snapshot.underspørsmål;
+      return snapshot.nåværende || 1;
+    } catch(e) { return false; }
+  },
+
+  nullstill: function() {
+    const bekreft = window.confirm('Er du sikker? Dette fjerner alle svarene dine og starter helt på nytt.');
+    if (!bekreft) return;
+    // Fjern Frihetsplanens egne svar
+    try { localStorage.removeItem(Steg.LAGRE_NØKKEL); } catch(e) {}
+    // Fjern all importert bolig-/bil-data via KH-broen
+    if (window.KH) KH.clear();
+    // Nullstill tilstand i minnet
+    Steg.tilstand.valgteMål = [];
+    Steg.tilstand.verdier = {};
+    Steg.tilstand.kategorier = {};
+    Steg.tilstand.underspørsmål = {};
+    Steg.tilstand.resultat = null;
+    Steg.tilstand.sisteOptimalisering = null;
+    Steg.tilstand.pensjonMålValg = null;
+    // Re-render og gå til steg 1
+    Render.tegnSteg1();
+    Render.tegnSteg2();
+    Steg.gåTil(1);
   },
 
   // ─── LAGRING VIA KH ──────────────────────────────────────────────────────
