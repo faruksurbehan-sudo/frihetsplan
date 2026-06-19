@@ -13,7 +13,10 @@
      HEADER + NAVIGASJON
 ═══════════════════════════════════════════════════════════ -->
 <header class="fp-header">
-  <div class="fp-logo">Frihets<span>planen</span></div>
+  <div class="fp-logo-gruppe">
+    <div class="fp-logo" onclick="Steg.gåTil(1)" title="Tilbake til start">Frihets<span>planen</span></div>
+    <button class="fp-nullstill-knapp" onclick="Steg.nullstill()">Start på nytt</button>
+  </div>
   <nav class="fp-nav">
     <div class="fp-nav-steg aktiv" data-nr="1" onclick="Steg.gåTil(1)">
       <span class="fp-nav-nr">1</span>
@@ -32,7 +35,7 @@
       <span>Din plan</span>
     </div>
   </nav>
-  <button class="fp-nullstill-knapp" onclick="Steg.nullstill()">Nullstill og begynn på nytt</button>
+
 </header>
 
 <!-- ═══════════════════════════════════════════════════════════

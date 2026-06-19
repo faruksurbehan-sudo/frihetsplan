@@ -45,7 +45,7 @@ body {
 .fp-header {
   padding: 28px 40px 24px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
@@ -78,6 +78,16 @@ body {
   letter-spacing: -0.5px;
 }
 .fp-logo span { color: var(--muted); font-style: italic; font-weight: 300; }
+.fp-logo-gruppe {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+.fp-logo {
+  cursor: pointer;
+}
+.fp-logo:hover span { color: var(--accent); }
 
 /* ── Steg-navigasjon ── */
 .fp-nav {
@@ -795,9 +805,26 @@ body {
   align-items: center;
   justify-content: center;
   gap: 20px;
-  margin-top: 22px;
-  padding-top: 22px;
+  margin-top: 16px;
+  padding: 18px 0 0;
   border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.fp-sammenligning-mål-tittel {
+  width: 100%;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.fp-sammenligning-gevinst {
+  width: 100%;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--grønn);
+  margin-top: 6px;
 }
 .fp-sammenligning-rad { text-align: center; }
 .fp-sammenligning-rad span { display: block; font-size: 11px; color: var(--muted); margin-bottom: 4px; }

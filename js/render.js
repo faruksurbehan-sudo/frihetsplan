@@ -545,25 +545,23 @@ Render.visOptimalisering = function() {
     return;
   }
 
-  const nærmesteForr = res.milepæler[0];
-  const nærmesteEtter = resJustert.milepæler[0]; // det FAKTISK nærmeste målet etter optimalisering — kan være et annet mål enn før
+  // Vis før/etter for HVERT valgte mål
+  const sammenligningHtml = res.milepæler.map(mFør => {
+    const mEtter = resJustert.milepæler.find(m => m.id === mFør.id);
+    if (!mFør || mFør.måneder === Infinity) return '';
 
-  let sammenligningHtml = '';
-  if (nærmesteForr && nærmesteEtter && nærmesteForr.måneder !== Infinity) {
-    const forrTekst = nærmesteForr.år + ' år' + (nærmesteForr.mndRest > 0 ? ' og ' + nærmesteForr.mndRest + ' mnd' : '');
-    const etterTekst = nærmesteEtter.måneder === Infinity ? 'fortsatt usikkert' : (nærmesteEtter.år + ' år' + (nærmesteEtter.mndRest > 0 ? ' og ' + nærmesteEtter.mndRest + ' mnd' : ''));
-    const byttetMål = nærmesteForr.id !== nærmesteEtter.id;
+    const forrTekst = mFør.nådd ? 'Du er allerede der!' : (mFør.år + ' år' + (mFør.mndRest > 0 ? ' og ' + mFør.mndRest + ' mnd' : ''));
+    const etterTekst = !mEtter ? '' : mEtter.nådd ? 'Du er allerede der!' : mEtter.måneder === Infinity ? 'fortsatt usikkert' : (mEtter.år + ' år' + (mEtter.mndRest > 0 ? ' og ' + mEtter.mndRest + ' mnd' : ''));
+    const forbedret = mEtter && !mEtter.nådd && !mFør.nådd && mEtter.måneder < mFør.måneder;
 
-    sammenligningHtml = '<div class="fp-optimalisering-sammenligning">'
-      + '<div class="fp-sammenligning-rad"><span>Før — ' + nærmesteForr.beskrivelse + '</span><strong>' + forrTekst + '</strong></div>'
+    return '<div class="fp-optimalisering-sammenligning">'
+      + '<div class="fp-sammenligning-mål-tittel">' + (mFør.ikon || '') + ' ' + mFør.beskrivelse + ' — ' + fp_fmtM(mFør.kostnad) + '</div>'
+      + '<div class="fp-sammenligning-rad"><span>Uten grepene</span><strong>' + forrTekst + '</strong></div>'
       + '<div class="fp-sammenligning-pil">→</div>'
-      + '<div class="fp-sammenligning-rad ny"><span>Med disse grepene' + (byttetMål ? ' — nå er ' + nærmesteEtter.beskrivelse.toLowerCase() + ' nærmest' : '') + '</span><strong>' + etterTekst + '</strong></div>'
+      + '<div class="fp-sammenligning-rad ny"><span>Med grepene</span><strong>' + etterTekst + '</strong></div>'
+      + (forbedret ? '<div class="fp-sammenligning-gevinst">Du sparer ' + (mFør.måneder - mEtter.måneder) + ' måneder</div>' : '')
       + '</div>';
-
-    if (byttetMål) {
-      sammenligningHtml += '<div class="fp-optimalisering-note">Disse grepene gjør alle målene dine raskere — men i forskjellig grad, så hvilket mål som er nærmest kan endre seg.</div>';
-    }
-  }
+  }).join('');
 
   container.innerHTML = '<div class="fp-optimalisering-kort">'
     + '<div class="fp-optimalisering-tittel">Konkret handlingsplan</div>'
