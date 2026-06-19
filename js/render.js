@@ -638,68 +638,161 @@ Render.tegnDelKort = function(res) {
     + '</div>';
 };
 
+// Hjelpefunksjon: wrap tekst på canvas
+Render._wrapTekst = function(ctx, tekst, x, y, maxBredde, linjeHøyde) {
+  const ord = tekst.split(' ');
+  let linje = '';
+  let yPos = y;
+  ord.forEach(ord => {
+    const test = linje + ord + ' ';
+    if (ctx.measureText(test).width > maxBredde && linje !== '') {
+      ctx.fillText(linje.trim(), x, yPos);
+      linje = ord + ' ';
+      yPos += linjeHøyde;
+    } else {
+      linje = test;
+    }
+  });
+  if (linje.trim()) ctx.fillText(linje.trim(), x, yPos);
+  return yPos + linjeHøyde;
+};
+
 Render.lastNedDelKort = function() {
   const res = Steg.tilstand.resultat;
   if (!res || res.milepæler.length === 0) return;
 
-  const nærmeste = res.milepæler.slice(0, 3);
+  const opt = Steg.tilstand.sisteOptimalisering;
+  const slagord = Render.velgDelTekst(res);
+  const milepæler = res.milepæler.slice(0, 3);
+  const tiltak = opt ? opt.opt.tiltak.slice(0, 4) : [];
 
-  const w = 1080, h = 1920; // story-format
+  const w = 1080, h = 1920;
   const canvas = document.createElement('canvas');
-  canvas.width = w;
-  canvas.height = h;
+  canvas.width = w; canvas.height = h;
   const ctx = canvas.getContext('2d');
-  if (!ctx) return; // canvas 2d ikke tilgjengelig i dette miljøet
+  if (!ctx) return;
 
-  // Bakgrunn
+  const PAD = 80;
+  const INNPAD = w - PAD * 2;
+
+  // ── Bakgrunn ──
   ctx.fillStyle = '#f7f4ef';
   ctx.fillRect(0, 0, w, h);
 
-  // Header
+  // ── Dekorativ stripe øverst ──
   ctx.fillStyle = '#c17a3a';
-  ctx.font = '600 56px Georgia, serif';
+  ctx.fillRect(0, 0, w, 12);
+
+  let y = 90;
+
+  // ── Logo ──
   ctx.textAlign = 'center';
-  ctx.fillText('Frihetsplanen', w / 2, 180);
-
+  ctx.fillStyle = '#c17a3a';
+  ctx.font = 'italic 400 52px Georgia, serif';
+  ctx.fillText('Frihets', w / 2 - 80, y);
   ctx.fillStyle = '#1a1714';
-  ctx.font = '400 36px Georgia, serif';
-  ctx.fillText('Min vei mot frihet', w / 2, 250);
+  ctx.font = '300 52px Georgia, serif';
+  ctx.fillText('planen', w / 2 + 60, y);
+  y += 70;
 
-  // Milepæl-kort
-  let y = 400;
-  nærmeste.forEach((m, i) => {
-    const kortH = 320;
+  // ── Slagord-boks ──
+  ctx.fillStyle = '#1a1714';
+  ctx.fillRect(PAD, y, INNPAD, 4);
+  y += 30;
+  ctx.fillStyle = '#1a1714';
+  ctx.font = 'italic 400 40px Georgia, serif';
+  ctx.textAlign = 'left';
+  y = Render._wrapTekst(ctx, '"' + slagord.replace('frihetsplan.no', '').trim() + '"', PAD, y, INNPAD, 54);
+  y += 10;
+  ctx.fillStyle = '#1a1714';
+  ctx.fillRect(PAD, y, INNPAD, 4);
+  y += 40;
+
+  // ── Graf fra steg 3 ──
+  const grafCanvas = document.getElementById('fp-graf-canvas');
+  if (grafCanvas && grafCanvas.width > 0) {
+    const grafH = Math.round(INNPAD * grafCanvas.height / grafCanvas.width);
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(80, y, w - 160, kortH);
+    ctx.fillRect(PAD, y, INNPAD, grafH + 32);
     ctx.strokeStyle = '#e0d9ce';
     ctx.lineWidth = 2;
-    ctx.strokeRect(80, y, w - 160, kortH);
-
-    ctx.fillStyle = '#c17a3a';
-    ctx.font = '700 64px Arial';
-    ctx.textAlign = 'left';
-    ctx.fillText(m.ikon, 120, y + 100);
-
-    ctx.fillStyle = '#1a1714';
-    ctx.font = '600 38px Arial';
-    ctx.fillText(m.beskrivelse, 220, y + 90);
-
+    ctx.strokeRect(PAD, y, INNPAD, grafH + 32);
+    ctx.font = '400 24px Arial';
     ctx.fillStyle = '#8a8078';
-    ctx.font = '400 30px Arial';
-    const tidTekst = m.nådd ? 'Allerede innenfor rekkevidde!' : (m.måneder === Infinity ? 'Krever høyere sparing' : 'Om ' + m.år + ' år' + (m.mndRest > 0 ? ' og ' + m.mndRest + ' mnd' : ''));
-    ctx.fillText(tidTekst, 220, y + 140);
+    ctx.textAlign = 'left';
+    ctx.fillText('Hva pengene dine kan bli om 5 år', PAD + 20, y + 28);
+    ctx.drawImage(grafCanvas, PAD + 10, y + 36, INNPAD - 20, grafH);
+    y += grafH + 32 + 30;
+  }
 
+  // ── Handlingsplan — mål høyde dynamisk ──
+  if (tiltak.length > 0) {
+    // Beregn høyde først ved å simulere tegningen
+    const linjeH = 34;
+    const tiltakRadH = 110; // fast høyde per tiltak: beløp + tekst + mellomrom
+    const tiltakH = 60 + tiltak.length * tiltakRadH;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(PAD, y, INNPAD, tiltakH);
+    ctx.strokeStyle = '#e0d9ce';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(PAD, y, INNPAD, tiltakH);
+    ctx.fillStyle = '#8a8078';
+    ctx.font = '400 22px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText('KONKRETE GREP', PAD + 24, y + 36);
+
+    let ty = y + 72;
+    tiltak.forEach(t => {
+      const beløp = t.type === 'engangsbeløp' ? fp_fmt(t.beløpEngang) : fp_fmtMnd(t.beløpMnd) + ' ekstra';
+      // Beløp på egen linje
+      ctx.fillStyle = '#3a7a5a';
+      ctx.font = '700 30px Arial';
+      ctx.fillText('+ ' + beløp, PAD + 24, ty);
+      ty += 38;
+      // Tekst på neste linje(r), innrykket
+      ctx.fillStyle = '#1a1714';
+      ctx.font = '300 26px Arial';
+      ty = Render._wrapTekst(ctx, t.tekst, PAD + 24, ty, INNPAD - 48, linjeH);
+      ty += 18; // luft mellom tiltakene
+    });
+    y += tiltakH + 30;
+  }
+
+  // ── Milepæler ──
+  milepæler.forEach(m => {
+    const tidTekst = m.nådd ? 'Allerede der! ✓' : m.måneder === Infinity ? 'Krever mer sparing' : 'Om ' + m.år + ' år' + (m.mndRest > 0 ? ' og ' + m.mndRest + ' mnd' : '');
+    const kortH = 110;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(PAD, y, INNPAD, kortH);
+    ctx.strokeStyle = '#e0d9ce';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(PAD, y, INNPAD, kortH);
+    // Venstre fargestrek
     ctx.fillStyle = '#3a7a5a';
-    ctx.font = '700 44px Arial';
-    ctx.fillText(fp_fmt(m.kostnad), 220, y + 210);
-
-    y += kortH + 40;
+    ctx.fillRect(PAD, y, 6, kortH);
+    // Ikon + beskrivelse
+    ctx.font = '400 36px Arial';
+    ctx.fillStyle = '#1a1714';
+    ctx.textAlign = 'left';
+    ctx.fillText(m.ikon, PAD + 24, y + 52);
+    ctx.font = '500 30px Arial';
+    ctx.fillText(m.beskrivelse, PAD + 80, y + 45);
+    ctx.font = '400 26px Arial';
+    ctx.fillStyle = '#c17a3a';
+    ctx.fillText(tidTekst, PAD + 80, y + 82);
+    y += kortH + 16;
   });
 
+  y += 20;
+
+  // ── Footer ──
+  ctx.fillStyle = '#c17a3a';
+  ctx.fillRect(0, h - 10, w, 10);
   ctx.fillStyle = '#8a8078';
-  ctx.font = '400 28px Arial';
+  ctx.font = '400 30px Arial';
   ctx.textAlign = 'center';
-  ctx.fillText('frihetsplan.no', w / 2, h - 80);
+  ctx.fillText('frihetsplan.no', w / 2, h - 36);
 
   const lenke = document.createElement('a');
   lenke.download = 'frihetsplanen-min-plan.png';
