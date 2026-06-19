@@ -331,8 +331,14 @@ Render.tegnSteg3 = function(res, v) {
     + '</div>'
     + '<div class="fp-øk-rad total">'
     + '<span class="fp-øk-label">Ledig kapital</span>'
-    + '<span class="fp-øk-val ' + (res.ledigMnd > 0 ? 'pos' : 'neg') + '">' + fp_fmtMnd(res.ledigMnd) + '</span>'
+    + '<span class="fp-øk-val ' + (res.ledigMnd > 0 ? 'pos' : 'neg') + '">' + (res.ledigMnd < 0 ? '− ' + fp_fmtMnd(Math.abs(res.ledigMnd)) : fp_fmtMnd(res.ledigMnd)) + '</span>'
     + '</div>'
+    + (res.ledigMnd < 0
+      ? '<div class="fp-øk-underskudd">'
+        + '<span class="fp-øk-underskudd-ikon">⚠</span>'
+        + '<span>Kostnadene overstiger inntekten din — men det finnes grep. Se innsiktene nedenfor.</span>'
+        + '</div>'
+      : '')
     + '</div>';
 
   const skjulte = res.skjulteKostnader.map(s => {

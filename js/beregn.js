@@ -173,7 +173,7 @@ Beregn.kjør = function(v, valgteMål) {
     + (v.andreLån * v.andreLånRente / 100 / 12)
     + matKostMnd;
 
-  const ledigMnd = Math.max(0, nettoMndInntekt - fasterKostMnd - v.sparingMnd);
+  const ledigMnd = nettoMndInntekt - fasterKostMnd - v.sparingMnd;
 
   const totalSparingMnd = v.sparingMnd + (biluteieÅr / 12);
 
