@@ -228,6 +228,28 @@ Beregn.kjør = function(v, valgteMål) {
 
 // ─── MILEPÆLBEREGNING ──────────────────────────────────────────────────────
 
+// Beregner hvor stort fond som kreves for å betale ut "uttakÅr" kr/år
+// i "antallÅr" år, mens fondet fortsatt vokser med "rente" per år.
+// Simulerer år for år: fond × (1 + rente) - uttakÅr, sjekker at det ikke går tomt.
+// Returnerer nødvendig fondsstørrelse (ved oppstartstidspunktet for deltid).
+Beregn.fondKrevesForUttak = function(uttakÅr, antallÅr, rente) {
+  if (antallÅr <= 0 || uttakÅr <= 0) return 0;
+  // Binærsøk: finn minste startfond der fondet ikke går tomt
+  let lo = 0, hi = uttakÅr * antallÅr * 5;
+  for (let i = 0; i < 64; i++) {
+    const mid = (lo + hi) / 2;
+    let fond = mid;
+    let gårTomt = false;
+    for (let år = 0; år < antallÅr; år++) {
+      fond = fond * (1 + rente) - uttakÅr;
+      if (fond < 0) { gårTomt = true; break; }
+    }
+    if (gårTomt) lo = mid;
+    else hi = mid;
+  }
+  return Math.ceil((lo + hi) / 2);
+};
+
 Beregn.beregnMilepæler = function(valgteMål, v, ctx) {
   const { nettoMndInntekt, fasterKostMnd, totalSparingMnd, ledigMnd, biluteieÅr, refinansSparingMnd, r } = ctx;
   const milepæler = [];
@@ -288,11 +310,24 @@ Beregn.beregnMilepæler = function(valgteMål, v, ctx) {
         break;
       }
       case 'jobbe_mindre': {
-        const inntektsTap = nettoMndInntekt * (mål.kostMndFaktor || 0.20);
-        kostnad = inntektsTap * 12;
-        måneder = Beregn.månederTilMål(kostnad, tilgjengeligMndAlle, fondNåAlle, r.fondAvkastning);
-        beskrivelse = 'Redusert stilling — ' + fp_fmtMnd(inntektsTap) + ' dekkes av passiv inntekt';
-        grep = ['Passiv inntekt kan dekke inntektstapet', 'Refinansiering frigjør kapital til fondsparing'];
+        // FI-logikk: fondet må tåle å betale ut inntektstapet hvert år frem til 62,
+        // mens det fortsatt vokser med avkastning på gjenværende beløp.
+        const stillingFaktor = mål.kostMndFaktor || 0.20; // 0.20 = 80% stilling
+        const inntektsTapÅr  = nettoMndInntekt * 12 * stillingFaktor;
+        const alder          = v.alder || 40;
+        const årTil62        = Math.max(1, 62 - alder);
+        // Fond som kreves VED tidspunktet for nedtrapping
+        const fondKreves = Beregn.fondKrevesForUttak(inntektsTapÅr, årTil62, r.fondAvkastning);
+        // Tid for å bygge dette fondet med dagens sparerate
+        måneder  = Beregn.månederTilMål(fondKreves, tilgjengeligMndAlle, fondNåAlle, r.fondAvkastning);
+        kostnad  = fondKreves; // brukes til visning
+        const stillingPst = Math.round((1 - stillingFaktor) * 100);
+        beskrivelse = stillingPst + '% stilling — fondet dekker ' + fp_fmtMnd(inntektsTapÅr / 12) + '/mnd frem til du er 62';
+        grep = [
+          'Fondet betaler ut ' + fp_fmtMnd(inntektsTapÅr / 12) + '/mnd i ' + årTil62 + ' år (til du er 62)',
+          'Fondet fortsetter å vokse på gjenværende kapital mens du tar ut',
+          refinansSparingMnd > 0 ? 'Refinansier boliglånet → ' + fp_fmtMnd(refinansSparingMnd) + ' ekstra/mnd mot dette målet' : null,
+        ].filter(Boolean);
         break;
       }
       case 'bolig': {
