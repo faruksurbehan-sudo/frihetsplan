@@ -178,6 +178,9 @@ const Steg = {
     Steg.tilstand.resultat = null;
     Steg.tilstand.sisteOptimalisering = null;
     Steg.tilstand.pensjonMålValg = null;
+    // Skjul pensjonsskjerm hvis den er åpen
+    const pensjonEl = document.getElementById('fp-pensjon-skjerm');
+    if (pensjonEl) pensjonEl.style.display = 'none';
     // Re-render og gå til steg 1
     Render.tegnSteg1();
     Render.tegnSteg2();

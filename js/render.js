@@ -574,6 +574,51 @@ Render.visOptimalisering = function() {
 // ─── DELBART STORY-BILDE — for Instagram/Snap/TikTok ──────────────────────
 // Tegner et portrettformat-kort direkte på canvas og eksporterer som PNG.
 
+Render.velgDelTekst = function(res) {
+  const v = Steg.byggVerdiObjekt ? Steg.byggVerdiObjekt() : {};
+  const nærmeste = res.milepæler[0];
+  const skjulteMnd = res.skjulteKostnader && res.skjulteKostnader.length > 0
+    ? (res.ledigMnd < 0 ? 0 : Math.round(res.ledigMnd)) : 0;
+
+  // Finn total skjult potensial fra grafen hvis tilgjengelig
+  const graf = Beregn.beregnSammenligningsgraf(v, res);
+  const potensialMnd = Math.round(graf.kurve3Mnd - graf.kurve1Mnd);
+
+  const url = 'frihetsplan.no';
+
+  // Velg beste tekst basert på situasjon
+  if (potensialMnd > 500) {
+    return 'Frihetsplanen fant ' + potensialMnd.toLocaleString('no-NO') + ' kr/mnd jeg ikke visste jeg hadde 👀 ' + url;
+  }
+  if (nærmeste && !nærmeste.nådd && nærmeste.måneder !== Infinity && nærmeste.år <= 15) {
+    return 'Jeg kan ha råd til ' + nærmeste.beskrivelse.toLowerCase() + ' om ' + nærmeste.år + ' år — uten å jobbe mer. ' + url;
+  }
+  if (nærmeste && nærmeste.kostnad >= 1000000) {
+    const år = nærmeste.år || '?';
+    return 'Jeg blir millionær om ' + år + ' år hvis jeg gjør dette. ' + url;
+  }
+  return 'Med smarte grep nå kan jeg leve friere og ha mer penger. Prøv selv: ' + url;
+};
+
+Render.kopierDelTekst = function() {
+  const res = Steg.tilstand.resultat;
+  if (!res) return;
+
+  const tekst = Render.velgDelTekst(res);
+  navigator.clipboard.writeText(tekst).then(() => {
+    const knapp = document.getElementById('fp-del-tekst-knapp');
+    if (knapp) {
+      const original = knapp.innerHTML;
+      knapp.innerHTML = '✓ Kopiert!';
+      knapp.style.color = 'var(--grønn)';
+      setTimeout(() => { knapp.innerHTML = original; knapp.style.color = ''; }, 2500);
+    }
+  }).catch(() => {
+    // Fallback for eldre nettlesere
+    prompt('Kopier denne teksten:', tekst);
+  });
+};
+
 Render.tegnDelKort = function(res) {
   const container = document.getElementById('fp-del-kort');
   if (!container || res.milepæler.length === 0) {
@@ -581,8 +626,15 @@ Render.tegnDelKort = function(res) {
     return;
   }
 
-  container.innerHTML = '<div class="fp-knapp-rad" style="justify-content:center;margin:24px 0;">'
-    + '<button class="fp-knapp fp-knapp-sekundær" onclick="Render.lastNedDelKort()">Last ned som bilde 📲</button>'
+  const tekst = Render.velgDelTekst(res);
+
+  container.innerHTML = '<div class="fp-del-seksjon">'
+    + '<div class="fp-del-tittel">Del med andre</div>'
+    + '<div class="fp-del-forslag">' + tekst + '</div>'
+    + '<div class="fp-knapp-rad" style="justify-content:center;gap:12px;margin-top:16px;">'
+    + '<button class="fp-knapp fp-knapp-sekundær" id="fp-del-tekst-knapp" onclick="Render.kopierDelTekst()">Kopier tekst 📋</button>'
+    + '<button class="fp-knapp fp-knapp-sekundær" onclick="Render.lastNedDelKort()">Last ned bilde 📲</button>'
+    + '</div>'
     + '</div>';
 };
 
