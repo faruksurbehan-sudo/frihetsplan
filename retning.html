@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finn din balanse — Frihetsplanen</title>
+<link rel="stylesheet" href="css/design.css">
+<link rel="stylesheet" href="css/retning.css">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-15Z8XL03P4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-15Z8XL03P4');
+</script>
+</head>
+<body>
+
+<header class="rd-header">
+  <a class="rd-tilbake-lenke" href="index.html">← Frihetsplanen</a>
+</header>
+
+<main class="rd-main">
+
+  <section id="rd-quiz-skjerm" class="rd-quiz-skjerm">
+    <div class="rd-quiz-intro">
+      <div class="rd-quiz-overskrift">Finn din <em>balanse</em></div>
+      <p class="rd-quiz-sub">8 raske spørsmål — under to minutter.</p>
+    </div>
+    <div id="rd-quiz-innhold"><!-- fylles av JS --></div>
+  </section>
+
+  <section id="rd-resultat-skjerm" class="rd-resultat-skjerm" style="display:none;">
+    <div id="rd-resultat-innhold"><!-- fylles av JS --></div>
+  </section>
+
+</main>
+
+<script src="js/data.js"></script>
+<script src="js/beregn.js"></script>
+<script src="js/retning-data.js"></script>
+<script src="js/retning.js"></script>
+
+</body>
+</html>

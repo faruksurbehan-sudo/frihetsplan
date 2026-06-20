@@ -1,0 +1,248 @@
+/* ── Finn din balanse — quiz-side ──────────────────────────────────────── */
+
+.rd-header {
+  padding: 24px 32px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.rd-tilbake-lenke {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+}
+.rd-tilbake-lenke:hover { color: var(--accent); }
+
+.rd-main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+/* ── Quiz ── */
+.rd-quiz-intro { text-align: center; margin-bottom: 36px; }
+.rd-quiz-overskrift {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 400;
+  color: var(--text);
+}
+.rd-quiz-overskrift em { color: var(--accent); font-style: italic; }
+.rd-quiz-sub { color: var(--muted); font-size: 14px; margin-top: 8px; font-family: var(--font-mono); }
+
+.rd-fremdrift {
+  height: 4px;
+  background: var(--surface2);
+  border-radius: 2px;
+  margin-bottom: 32px;
+  overflow: hidden;
+}
+.rd-fremdrift-bar {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.rd-spm-tittel {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 28px;
+  line-height: 1.4;
+}
+
+.rd-bransje-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.rd-bransje-knapp {
+  padding: 16px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.rd-bransje-knapp:hover { border-color: var(--accent); background: var(--lys-accent); }
+
+.rd-valg-liste { display: flex; flex-direction: column; gap: 10px; }
+.rd-valg-knapp {
+  padding: 16px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s;
+  line-height: 1.5;
+}
+.rd-valg-knapp:hover { border-color: var(--accent); background: var(--lys-accent); }
+
+.rd-alder-wrap { display: flex; gap: 12px; justify-content: center; align-items: center; }
+.rd-alder-input {
+  width: 120px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 18px;
+  text-align: center;
+}
+.rd-alder-input:focus { outline: none; border-color: var(--accent); }
+
+.rd-tilbake-rad { margin-top: 24px; text-align: center; }
+.rd-knapp-tekst {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  cursor: pointer;
+}
+.rd-knapp-tekst:hover { color: var(--accent); }
+
+.rd-knapp-primær {
+  display: inline-block;
+  padding: 14px 28px;
+  background: var(--accent);
+  color: var(--surface);
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.rd-knapp-primær:hover { opacity: 0.85; }
+
+/* ── Resultat ── */
+.rd-seksjon-overskrift {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 400;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 8px;
+}
+.rd-seksjon-overskrift em { color: var(--accent); font-style: italic; }
+.rd-seksjon-intro {
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.rd-pensjon-seksjon { margin-bottom: 48px; }
+.rd-pensjon-kort-rad { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.rd-pensjon-kort {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  text-align: center;
+}
+.rd-pensjon-kort-tittel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.rd-pensjon-kort-verdi {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--grønn);
+}
+.rd-pensjon-kort-sub {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  margin-top: 4px;
+}
+
+.rd-profil-seksjon { margin-bottom: 40px; }
+.rd-søyle-liste { display: flex; flex-direction: column; gap: 16px; }
+.rd-søyle-rad {
+  display: flex;
+  gap: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+.rd-søyle-ikon { font-size: 32px; flex-shrink: 0; }
+.rd-søyle-innhold { flex: 1; }
+.rd-søyle-navn {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.rd-søyle-bar-wrap {
+  height: 6px;
+  background: var(--surface2);
+  border-radius: 3px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.rd-søyle-bar {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+}
+.rd-søyle-beskrivelse {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.6;
+  margin-bottom: 6px;
+}
+.rd-søyle-retning {
+  font-size: 12px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+
+.rd-anbefaling-seksjon {
+  text-align: center;
+  background: var(--lys-accent);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-lg);
+  padding: 28px 24px;
+}
+.rd-anbefaling-tittel {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.rd-anbefaling-tekst {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 18px;
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .rd-bransje-grid { grid-template-columns: 1fr; }
+  .rd-pensjon-kort-rad { grid-template-columns: 1fr; }
+  .rd-quiz-overskrift { font-size: 28px; }
+  .rd-spm-tittel { font-size: 20px; }
+}
