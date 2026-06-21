@@ -233,6 +233,14 @@ FP.MÅL = [
     min: 10000, max: 2000000, standard: 100000,
     fritekst: true,
   },
+  {
+    id: 'refinansier',
+    ikon: '📑',
+    tittel: 'Refinansier',
+    undertittel: 'Samle lånene dine — bedre rente, mer frihet',
+    type: 'navigasjon',
+    lenke: 'refinansiering.html',
+  },
 ];
 
 // ─── LIVSSITUASJON — FELT (Steg 2b) ────────────────────────────────────────
@@ -479,6 +487,7 @@ FP.SCENARIOER = [
     beskriv: (d) => 'Med 0,5% lavere rente sparer du ' + fp_fmt(d.refinansSparingMnd) + '/mnd.',
     innsikt: (d) => 'Over 10 år er det ' + fp_fmt(d.refinansOver10år) + ' — investert i fond: ' + fp_fmt(d.refinansIFond) + '.',
     handling: 'Sjekk refinansiering',
+    lenke: 'refinansiering.html',
     ikon: '🏠',
     relevant: (v) => v.boligTilstand === 'eier' && v.boligLån > 0,
   },

@@ -230,6 +230,15 @@ body {
   background: var(--accent);
   border-color: var(--accent);
 }
+.fp-mål-kort-navigasjon {
+  display: block;
+  text-decoration: none;
+}
+.fp-mål-kort-navigasjon .fp-mål-check {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
 
 /* Ekstra mål-felter */
 #fp-mål-ekstra { margin-bottom: 32px; }

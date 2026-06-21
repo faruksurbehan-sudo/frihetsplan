@@ -13,6 +13,14 @@ Render.tegnSteg1 = function() {
   if (!container) return;
 
   container.innerHTML = FP.MÅL.map(m => {
+    if (m.type === 'navigasjon') {
+      return '<a class="fp-mål-kort fp-mål-kort-navigasjon" href="' + m.lenke + '" data-id="' + m.id + '">'
+        + '<div class="fp-mål-ikon">' + m.ikon + '</div>'
+        + '<div class="fp-mål-tittel">' + m.tittel + '</div>'
+        + '<div class="fp-mål-sub">' + m.undertittel + '</div>'
+        + '<div class="fp-mål-check">→</div>'
+        + '</a>';
+    }
     const valgt = Steg.harMål(m.id);
     return '<div class="fp-mål-kort' + (valgt ? ' valgt' : '') + '" onclick="Steg.toggleMål(\'' + m.id + '\')" data-id="' + m.id + '">'
       + '<div class="fp-mål-ikon">' + m.ikon + '</div>'

@@ -1,0 +1,246 @@
+/* © 2026 Frihetsplanen (frihetsplan.no). Alle rettigheter forbeholdt. */
+/* ============================================================
+   Frihetsplanen — refinans.css
+   Stilark for refinansieringssiden.
+   ============================================================ */
+
+.rf-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.rf-tilbake-lenke {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: none;
+}
+.rf-tilbake-lenke:hover { color: var(--accent); }
+
+.rf-main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+}
+
+/* ── Intro ── */
+.rf-intro { text-align: center; margin-bottom: 36px; }
+.rf-overskrift {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 400;
+  color: var(--text);
+}
+.rf-overskrift em { color: var(--accent); font-style: italic; }
+.rf-sub {
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+/* ── Skyvere ── */
+.rf-skyvere { margin-bottom: 28px; }
+
+.rf-import-banner {
+  background: var(--lys-accent);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--text);
+}
+.rf-knapp-liten {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  padding: 8px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.rf-knapp-liten:hover { opacity: 0.85; }
+
+.rf-lån-kort {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.rf-lån-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.rf-lån-ikon { font-size: 20px; }
+.rf-lån-navn {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--text);
+}
+
+.rf-felt { margin-bottom: 14px; }
+.rf-felt:last-of-type { margin-bottom: 0; }
+.rf-felt label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.rf-felt-rad {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.rf-felt-rad input[type="range"] { flex: 1; }
+.rf-val {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text);
+  white-space: nowrap;
+  min-width: 70px;
+  text-align: right;
+}
+
+.rf-infoboks {
+  margin-top: 12px;
+  background: var(--surface2);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* ── Resultat ── */
+.rf-resultat { margin-bottom: 28px; }
+.rf-tom-melding {
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  padding: 24px;
+}
+.rf-resultat-kort {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+.rf-resultat-rad {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.rf-resultat-rad strong {
+  font-family: var(--font-mono);
+  color: var(--text);
+  font-size: 14px;
+}
+.rf-resultat-hovedrad {
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+  padding-top: 16px;
+}
+.rf-resultat-hovedrad span { font-size: 14px; color: var(--text); }
+.rf-resultat-hovedrad strong { font-size: 20px; color: var(--grønn); }
+.rf-resultat-sub {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-top: 12px;
+}
+
+/* ── Tilbydere (forberedt, tom inntil RF.TILBYDERE har innhold) ── */
+.rf-tilbydere-seksjon { margin-bottom: 28px; }
+.rf-tilbyder-kort {
+  display: block;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-top: 10px;
+  text-decoration: none;
+  color: var(--text);
+}
+
+/* ── Lead-skjema ── */
+.rf-lead-seksjon {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 36px;
+  text-align: center;
+}
+.rf-seksjon-overskrift {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.rf-lead-sub {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 18px;
+}
+.rf-lead-felt {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.rf-lead-felt:focus { outline: none; border-color: var(--accent); }
+.rf-knapp-primær {
+  width: 100%;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  padding: 14px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  margin-top: 4px;
+}
+.rf-knapp-primær:hover { opacity: 0.85; }
+
+/* ── Frihetsplanen-oppfordring ── */
+.rf-cta-seksjon {
+  text-align: center;
+  padding: 24px 16px;
+}
+.rf-cta-tekst {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+.rf-cta-lenke {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  color: var(--accent);
+  text-decoration: none;
+}
+.rf-cta-lenke:hover { text-decoration: underline; }

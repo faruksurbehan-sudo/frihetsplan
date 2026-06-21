@@ -1,0 +1,60 @@
+<!-- © 2026 Frihetsplanen (frihetsplan.no). Alle rettigheter forbeholdt. -->
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Refinansiering — Frihetsplanen</title>
+<meta name="description" content="Se hva du kan spare ved å samle lånene dine til én avtale med bedre rente.">
+<link rel="stylesheet" href="css/design.css">
+<link rel="stylesheet" href="css/refinans.css">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-15Z8XL03P4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-15Z8XL03P4');
+</script>
+</head>
+<body>
+
+<header class="rf-header">
+  <a class="rf-tilbake-lenke" href="index.html">← Frihetsplanen</a>
+</header>
+
+<main class="rf-main">
+
+  <div class="rf-intro">
+    <div class="rf-overskrift">Ei <em>friheten</em></div>
+    <p class="rf-sub">Ikke betal den vekk, refinansier.</p>
+  </div>
+
+  <section id="rf-skyvere" class="rf-skyvere"><!-- fylles av JS --></section>
+
+  <section id="rf-resultat" class="rf-resultat"><!-- fylles av JS --></section>
+
+  <section id="rf-tilbydere"><!-- fylles av JS, tom inntil RF.TILBYDERE har innhold --></section>
+
+  <section class="rf-lead-seksjon">
+    <div class="rf-seksjon-overskrift">Kan Frihetsplanen hjelpe meg?</div>
+    <p class="rf-lead-sub">Send oss tallene dine, så ser vi om vi kan hjelpe deg videre.</p>
+    <input type="text" id="rf-lead-navn" class="rf-lead-felt" placeholder="Navn">
+    <input type="email" id="rf-lead-epost" class="rf-lead-felt" placeholder="E-post">
+    <button class="rf-knapp-primær" onclick="Refinans.sendHenvendelse()">Send henvendelse</button>
+  </section>
+
+  <section class="rf-cta-seksjon">
+    <p class="rf-cta-tekst">Dette var bare én ting. Frihetsplanen finner resten av pengene du ikke ser.</p>
+    <a class="rf-cta-lenke" href="index.html">Finn dem nå →</a>
+  </section>
+
+</main>
+
+<script src="js/data.js"></script>
+<script src="js/beregn.js"></script>
+<script src="js/refinans-data.js"></script>
+<script src="js/refinans.js"></script>
+
+</body>
+</html>
