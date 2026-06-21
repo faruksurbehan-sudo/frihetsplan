@@ -1,3 +1,4 @@
+/* © 2026 Frihetsplanen (frihetsplan.no). Alle rettigheter forbeholdt. */
 /**
  * Frihetsplanen — retning.js
  * Logikk og rendering for "Finn din balanse"-quizen.
@@ -214,7 +215,7 @@ const Retning = {
       + '<a class="rd-knapp-primær" href="' + anbefaling.lenke + '">' + anbefaling.knapptekst + '</a>'
       + '</div>';
 
-    document.getElementById('rd-resultat-innhold').innerHTML = pensjonHtml + profilHtml + anbefalingHtml;
+    document.getElementById('rd-resultat-innhold').innerHTML = profilHtml + pensjonHtml + anbefalingHtml;
   },
 };
 

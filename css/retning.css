@@ -148,7 +148,15 @@
   line-height: 1.6;
 }
 
-.rd-pensjon-seksjon { margin-bottom: 48px; }
+.rd-pensjon-seksjon { margin-bottom: 40px; margin-top: 8px; }
+.rd-pensjon-seksjon .rd-seksjon-overskrift {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+.rd-pensjon-seksjon .rd-seksjon-intro {
+  font-size: 12px;
+  margin-bottom: 16px;
+}
 .rd-pensjon-kort-rad { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .rd-pensjon-kort {
   background: var(--surface);

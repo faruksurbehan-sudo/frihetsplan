@@ -376,11 +376,17 @@ Beregn.beregnMilepæler = function(valgteMål, v, ctx) {
 };
 
 Beregn.biluteieDeckerHva = function(biluteieÅr, valgteMål, v) {
-  if (biluteieÅr === 0) return 'ingenting (du har ikke bil)';
+  const harBil = v.transportTilstand === 'bil' || v.transportTilstand === 'begge';
+  if (!harBil) return 'ingenting (du har ikke bil)';
+  // Hvis brukeren ikke leier ut ennå (biluteieÅr er da 0), bruk et potensielt
+  // estimat i stedet for det faktiske (0) tallet, slik at "dekker X%" faktisk
+  // sier noe nyttig om hva utleie KAN gi — ikke hva den gir akkurat nå.
+  const erNedbetalt = v.bilFinansiering === 'nedbetalt' || v.bilFinansieringBegge === 'nedbetalt';
+  const beløpÅVise = biluteieÅr > 0 ? biluteieÅr : (erNedbetalt ? 500*60*0.8 : 700*60*0.8);
   const reiseMål = valgteMål.find(m => m.id === 'reise');
   if (reiseMål) {
     const kostnad = reiseMål.kostÅr || 80000;
-    const pst = Math.min(100, Math.round(biluteieÅr / kostnad * 100));
+    const pst = Math.min(100, Math.round(beløpÅVise / kostnad * 100));
     return pst + '% av drømmereisen din';
   }
   return 'en uke ekstra ferie i året';

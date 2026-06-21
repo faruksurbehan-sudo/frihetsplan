@@ -516,7 +516,18 @@ FP.SCENARIOER = [
     innsikt: (d) => 'Det dekker ' + d.biluteieDeckerMål + '.',
     handling: 'Se bilkalkulatoren',
     ikon: '🚗',
-    relevant: (v) => (v.transportTilstand === 'bil' || v.transportTilstand === 'begge') && !(v.bilUtleieInntektMnd > 0),
+    relevant: (v) => (v.transportTilstand === 'bil' || v.transportTilstand === 'begge') && !(v.bilUtleieInntektMnd > 0)
+      && (v.bilFinansiering !== 'nedbetalt' && v.bilFinansieringBegge !== 'nedbetalt'),
+  },
+  {
+    id: 'bil_utleie_nedbetalt',
+    tittel: 'Bilen din kan finansiere ferien din',
+    beskriv: (d) => 'Bilen er nedbetalt og står ubrukt — utleie bør sterkt vurderes. Konservativt anslag: 500 kr/dag × 60 dager/år = ' + fp_fmt(500*60*0.8) + ' netto i året.',
+    innsikt: (d) => 'Uten lån å betjene går nesten alt rett i lommen. Dette er et forsiktig anslag — se bilkalkulatoren for ditt eksakte potensial.',
+    handling: 'Se bilkalkulatoren',
+    ikon: '🚗',
+    relevant: (v) => (v.transportTilstand === 'bil' || v.transportTilstand === 'begge') && !(v.bilUtleieInntektMnd > 0)
+      && (v.bilFinansiering === 'nedbetalt' || v.bilFinansieringBegge === 'nedbetalt'),
   },
   {
     id: 'bil_utleie_aktiv',

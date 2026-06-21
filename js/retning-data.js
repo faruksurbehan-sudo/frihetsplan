@@ -1,3 +1,4 @@
+/* © 2026 Frihetsplanen (frihetsplan.no). Alle rettigheter forbeholdt. */
 /**
  * Frihetsplanen — retning-data.js
  * Spørsmål, svaralternativer og poengvekting for "Finn din balanse"-quizen.
