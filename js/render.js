@@ -342,6 +342,9 @@ Render.tegnSteg3 = function(res, v) {
     + '</div>';
 
   const skjulte = res.skjulteKostnader.map(s => {
+    const handlingHtml = s.lenke
+      ? '<a class="fp-innsikt-handling" href="' + s.lenke + '">' + s.handling + ' →</a>'
+      : '<div class="fp-innsikt-handling">' + s.handling + ' →</div>';
     return '<div class="fp-innsikt-kort">'
       + '<div class="fp-innsikt-ikon">' + s.ikon + '</div>'
       + '<div class="fp-innsikt-innhold">'
@@ -349,7 +352,7 @@ Render.tegnSteg3 = function(res, v) {
       + '<div class="fp-innsikt-beskriv">' + s.beskriv(res) + '</div>'
       + '<div class="fp-innsikt-innsikt">' + s.innsikt(res) + '</div>'
       + '</div>'
-      + '<div class="fp-innsikt-handling">' + s.handling + ' →</div>'
+      + handlingHtml
       + '</div>';
   }).join('');
 

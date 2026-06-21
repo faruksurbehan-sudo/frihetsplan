@@ -496,8 +496,11 @@ body {
   white-space: nowrap;
   margin-top: 4px;
   cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
 }
 .fp-innsikt-handling:hover { text-decoration: underline; }
+.fp-innsikt-handling:visited { color: var(--accent); }
 
 /* ── Steg 4: Frihetsplanen ── */
 .fp-steg4-wrap {

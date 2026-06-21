@@ -515,6 +515,7 @@ FP.SCENARIOER = [
     beskriv: (d) => 'Leier du ut bilen 60 dager/år på Nabobil (snitt 700 kr/dag) tjener du ca ' + fp_fmt(60*700*0.8) + ' netto.',
     innsikt: (d) => 'Det dekker ' + d.biluteieDeckerMål + '.',
     handling: 'Se bilkalkulatoren',
+    lenke: 'kalkulatorer/bil.html',
     ikon: '🚗',
     relevant: (v) => (v.transportTilstand === 'bil' || v.transportTilstand === 'begge') && !(v.bilUtleieInntektMnd > 0)
       && (v.bilFinansiering !== 'nedbetalt' && v.bilFinansieringBegge !== 'nedbetalt'),
@@ -525,6 +526,7 @@ FP.SCENARIOER = [
     beskriv: (d) => 'Bilen er nedbetalt og står ubrukt — utleie bør sterkt vurderes. Konservativt anslag: 500 kr/dag × 60 dager/år = ' + fp_fmt(500*60*0.8) + ' netto i året.',
     innsikt: (d) => 'Uten lån å betjene går nesten alt rett i lommen. Dette er et forsiktig anslag — se bilkalkulatoren for ditt eksakte potensial.',
     handling: 'Se bilkalkulatoren',
+    lenke: 'kalkulatorer/bil.html',
     ikon: '🚗',
     relevant: (v) => (v.transportTilstand === 'bil' || v.transportTilstand === 'begge') && !(v.bilUtleieInntektMnd > 0)
       && (v.bilFinansiering === 'nedbetalt' || v.bilFinansieringBegge === 'nedbetalt'),
@@ -535,6 +537,7 @@ FP.SCENARIOER = [
     beskriv: (d) => 'Du leier ut bilen for ' + fp_fmtMnd(d.biluteieMnd) + ' — det er ' + fp_fmt(d.biluteieÅr) + ' i året.',
     innsikt: (d) => 'Investert i fond i stedet for å stå urørt, dekker det ' + d.biluteieDeckerMål + '.',
     handling: 'Juster i bilkalkulatoren',
+    lenke: 'kalkulatorer/bil.html',
     ikon: '🚗',
     relevant: (v) => (v.transportTilstand === 'bil' || v.transportTilstand === 'begge') && v.bilUtleieInntektMnd > 0,
   },
