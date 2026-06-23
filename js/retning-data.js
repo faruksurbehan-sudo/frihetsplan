@@ -99,7 +99,7 @@ RD.SPØRSMÅL = [
   {
     id: 'bransje',
     type: 'bransje', // egen rendering — grid av knapper fra RD.BRANSJER
-    tittel: 'Jeg er i dag:',
+    tittel: 'Hva beskriver din situasjon best?',
   },
 
   // ─── 2. Alder ───────────────────────────────────────────────────────────

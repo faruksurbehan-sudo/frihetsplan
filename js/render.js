@@ -463,13 +463,15 @@ Render.tegnSteg4 = function(res, v) {
   }
 
   const milepæler = res.milepæler.map((m, i) => {
-    const tidTekst = m.nådd
-      ? 'Du er allerede der!'
-      : m.måneder === Infinity
-        ? 'Krever høyere sparing'
-        : m.år === 0
-          ? 'Om ' + m.mndRest + ' måneder'
-          : 'Om ' + m.år + ' år' + (m.mndRest > 0 ? ' og ' + m.mndRest + ' mnd' : '');
+    const tidTekst = m.måneder === Infinity
+      ? 'Krever høyere sparing'
+      : m.år === 0
+        ? 'Om ' + m.mndRest + ' måneder'
+        : 'Om ' + m.år + ' år' + (m.mndRest > 0 ? ' og ' + m.mndRest + ' mnd' : '');
+
+    const kapitalNoteHtml = m.harKapital
+      ? '<div class="fp-milepæl-kapital-note">Du har kapital nok til dette i dag — men spar deg frem så beholdningen forblir intakt.</div>'
+      : '';
 
     const grepHtml = m.grep.length > 0
       ? '<div class="fp-grep-liste">' + m.grep.map(g => '<div class="fp-grep">→ ' + g + '</div>').join('') + '</div>'
@@ -481,18 +483,21 @@ Render.tegnSteg4 = function(res, v) {
       + '<div class="fp-milepæl-innhold">'
       + '<div class="fp-milepæl-tittel">' + m.beskrivelse + '</div>'
       + '<div class="fp-milepæl-kostnad">' + fp_fmtM(m.kostnad) + '</div>'
+      + kapitalNoteHtml
       + grepHtml
       + '</div>'
       + '</div>';
   }).join('');
 
-  const nåddAntall = res.milepæler.filter(m => m.nådd).length;
+  const harKapitalAntall = res.milepæler.filter(m => m.harKapital).length;
   const totalt = res.milepæler.length;
 
   const oppsummering = '<div class="fp-score">'
     + '<div class="fp-score-label">Din frihetsplan — uten ekstra tiltak</div>'
-    + '<div class="fp-score-tall">' + nåddAntall + ' / ' + totalt + '</div>'
-    + '<div class="fp-score-sub">mål allerede innenfor rekkevidde, basert på tallene du har oppgitt</div>'
+    + (harKapitalAntall > 0
+      ? '<div class="fp-score-tall">' + harKapitalAntall + ' / ' + totalt + '</div>'
+        + '<div class="fp-score-sub">mål du har kapital til i dag — men spar deg frem så beholdningen forblir intakt</div>'
+      : '')
     + '</div>'
     + '<div class="fp-uten-tiltak-varsel">Dette er planen din slik den er <strong>i dag</strong> — uten å gjøre noen av grepene fra forrige steg. Trykk på knappen under for å se hvor mye raskere du kan nå målene.</div>';
 
@@ -521,6 +526,7 @@ Render.tegnOptimaliserKnapp = function(v, res) {
 };
 
 Render.visOptimalisering = function() {
+  try {
   const v = Steg.byggVerdiObjekt();
   const res = Steg.tilstand.resultat;
   if (!res) return;
@@ -534,9 +540,14 @@ Render.visOptimalisering = function() {
   if (!container) return;
 
   const tiltakHtml = opt.tiltak.map(t => {
-    const beløpTekst = t.type === 'engangsbeløp'
-      ? fp_fmt(t.beløpEngang) + ' (engangsbeløp)'
-      : fp_fmtMnd(t.beløpMnd) + ' ekstra';
+    let beløpTekst;
+    if (t.type === 'engangsbeløp') {
+      beløpTekst = fp_fmt(t.beløpEngang) + ' (engangsbeløp)';
+    } else if (t.type === 'vinning') {
+      beløpTekst = '+ ' + fp_fmt(t.vinning10år) + ' mer enn i bank over 10 år';
+    } else {
+      beløpTekst = fp_fmtMnd(t.beløpMnd) + ' ekstra';
+    }
     return '<div class="fp-tiltak-rad">'
       + '<span class="fp-tiltak-tekst">' + t.tekst + '</span>'
       + '<span class="fp-tiltak-beløp">' + beløpTekst + '</span>'
@@ -561,12 +572,33 @@ Render.visOptimalisering = function() {
     const mEtter = resJustert.milepæler.find(m => m.id === mFør.id);
     if (!mFør || mFør.måneder === Infinity) return '';
 
-    const forrTekst = mFør.nådd ? 'Du er allerede der!' : (mFør.år + ' år' + (mFør.mndRest > 0 ? ' og ' + mFør.mndRest + ' mnd' : ''));
-    const etterTekst = !mEtter ? '' : mEtter.nådd ? 'Du er allerede der!' : mEtter.måneder === Infinity ? 'fortsatt usikkert' : (mEtter.år + ' år' + (mEtter.mndRest > 0 ? ' og ' + mEtter.mndRest + ' mnd' : ''));
-    const forbedret = mEtter && !mEtter.nådd && !mFør.nådd && mEtter.måneder < mFør.måneder;
+    // Grønt signal: brukeren har kapital nok nå, men anbefales spareplan
+    const kapitalSignalHtml = mFør.harKapital
+      ? '<div class="fp-sammenligning-kontant-signal">'
+        + '✓ Du har faktisk kapital nok til dette i dag — men vi anbefaler å spare deg frem til det, '
+        + 'slik at beholdningen forblir intakt som buffer.'
+        + '</div>'
+      : '';
+
+    const forrTekst = mFør.måneder === Infinity
+      ? 'Krever høyere sparing'
+      : mFør.år === 0
+        ? 'Om ' + mFør.mndRest + ' mnd'
+        : mFør.år + ' år' + (mFør.mndRest > 0 ? ' og ' + mFør.mndRest + ' mnd' : '');
+
+    const etterTekst = !mEtter
+      ? ''
+      : mEtter.måneder === Infinity
+        ? 'fortsatt usikkert'
+        : mEtter.år === 0
+          ? 'Om ' + mEtter.mndRest + ' mnd'
+          : mEtter.år + ' år' + (mEtter.mndRest > 0 ? ' og ' + mEtter.mndRest + ' mnd' : '');
+
+    const forbedret = mEtter && mEtter.måneder < mFør.måneder && mFør.måneder !== Infinity;
 
     return '<div class="fp-optimalisering-sammenligning">'
       + '<div class="fp-sammenligning-mål-tittel">' + (mFør.ikon || '') + ' ' + mFør.beskrivelse + ' — ' + fp_fmtM(mFør.kostnad) + '</div>'
+      + kapitalSignalHtml
       + '<div class="fp-sammenligning-rad"><span>Uten grepene</span><strong>' + forrTekst + '</strong></div>'
       + '<div class="fp-sammenligning-pil">→</div>'
       + '<div class="fp-sammenligning-rad ny"><span>Med grepene</span><strong>' + etterTekst + '</strong></div>'
@@ -580,6 +612,11 @@ Render.visOptimalisering = function() {
     + '<div class="fp-tiltak-liste">' + tiltakHtml + '</div>'
     + sammenligningHtml
     + '</div>';
+  } catch(e) {
+    console.error('visOptimalisering feilet:', e);
+    const container = document.getElementById('fp-optimaliser-resultat');
+    if (container) container.innerHTML = '<div class="fp-optimalisering-kort"><div class="fp-optimalisering-intro">Noe gikk galt. Prøv å laste siden på nytt.</div></div>';
+  }
 };
 
 // ─── DELBART STORY-BILDE — for Instagram/Snap/TikTok ──────────────────────
@@ -601,7 +638,7 @@ Render.velgDelTekst = function(res) {
   if (potensialMnd > 500) {
     return 'Frihetsplanen fant ' + potensialMnd.toLocaleString('no-NO') + ' kr/mnd jeg ikke visste jeg hadde 👀 ' + url;
   }
-  if (nærmeste && !nærmeste.nådd && nærmeste.måneder !== Infinity && nærmeste.år <= 15) {
+  if (nærmeste && nærmeste.måneder !== Infinity && nærmeste.år <= 15) {
     return 'Jeg kan ha råd til ' + nærmeste.beskrivelse.toLowerCase() + ' om ' + nærmeste.år + ' år — uten å jobbe mer. ' + url;
   }
   if (nærmeste && nærmeste.kostnad >= 1000000) {
@@ -772,7 +809,7 @@ Render.lastNedDelKort = function() {
 
   // ── Milepæler ──
   milepæler.forEach(m => {
-    const tidTekst = m.nådd ? 'Allerede der! ✓' : m.måneder === Infinity ? 'Krever mer sparing' : 'Om ' + m.år + ' år' + (m.mndRest > 0 ? ' og ' + m.mndRest + ' mnd' : '');
+    const tidTekst = m.måneder === Infinity ? 'Krever mer sparing' : 'Om ' + m.år + ' år' + (m.mndRest > 0 ? ' og ' + m.mndRest + ' mnd' : '');
     const kortH = 110;
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(PAD, y, INNPAD, kortH);

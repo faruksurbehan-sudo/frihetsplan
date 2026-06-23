@@ -30,8 +30,15 @@ Beregn.NV = function(FV, rente, år) {
 };
 
 Beregn.månederTilMål = function(mål, mndSparing, startKapital, rente) {
-  if (mndSparing <= 0 && startKapital >= mål) return 0;
-  if (mndSparing <= 0) return Infinity;
+  // Selv om startkapital alene dekker målet, viser vi alltid en tidslinje.
+  // Frihetsplanen anbefaler aldri å tømme beholdningen — man skal spare seg frem.
+  // Return 0 fjernet bevisst: "0 måneder" gir "allerede der", som er feil signal.
+  if (mndSparing <= 0 && startKapital < mål) return Infinity;
+  if (mndSparing <= 0 && startKapital >= mål) {
+    // Har kapital nok, men ingen løpende sparing — returner et symbolsk tall
+    // som signaliserer "du kan nå dette uten mer sparing, men bruk ikke opp beholdningen"
+    return 1; // vises som "Om 1 måned" — overskrives av nåddViaKapital-flagget i render
+  }
   const r = rente / 12;
   let kapital = startKapital;
   for (let m = 1; m <= 600; m++) {
@@ -67,11 +74,12 @@ Beregn.kjør = function(v, valgteMål) {
     refinansOver10år          = refinansSparingMnd * 12 * 10;
     refinansIFond              = Beregn.FVmnd(refinansSparingMnd, r.fondAvkastning, 10);
 
-    // Rammelån-allokering: forskjell mellom boliglånsrente og rammelånsrente,
-    // anvendt på den delen av sparepengene som med fordel kunne ligget i rammelån
+    // Rammelån-allokering: forskjell mellom boliglånsrente og hva pengene faktisk
+    // tjener i banken (bankRente). Det er denne differansen som er den reelle
+    // besparelsen — ikke differansen mot boligrenten selv (som alltid gir 0).
     if (v.fondNå > 100000) {
       const allokerbartBeløp = Math.min(v.fondNå * 0.5, v.boligLån * 0.3);
-      rammelånBesparelseÅr = allokerbartBeløp * (v.boligRente/100 - r.rammelånRente);
+      rammelånBesparelseÅr = allokerbartBeløp * (v.boligRente/100 - r.bankRente);
     }
   } else {
     boligKostMnd = v.husleieMnd || 0;
@@ -274,7 +282,9 @@ Beregn.beregnMilepæler = function(valgteMål, v, ctx) {
   // disponible beløpet (inntekt minus faste kostnader, der "faste kostnader"
   // ikke inkluderer sparing), pluss bilutleie og refinansieringsgevinst.
   const tilgjengeligMndAlle = Math.max(0, nettoMndInntekt - fasterKostMnd) + (biluteieÅr / 12) + refinansSparingMnd;
-  const fondNåAlle = v.fondNå || 0;
+  // Inkluder kontantbeholdning som tilgjengelig startkapital mot mål —
+  // men kun 90% (10% beholdes som buffer, konsistent med optimaliser-regelen).
+  const fondNåAlle = (v.fondNå || 0) + (v.kontantbeholdning || 0) * 0.9;
 
   valgteMål.forEach(mål => {
     const def = FP.MÅL.find(m => m.id === mål.id);
@@ -364,9 +374,13 @@ Beregn.beregnMilepæler = function(valgteMål, v, ctx) {
     if (kostnad !== null) {
       const år = måneder === Infinity ? null : Math.floor(måneder / 12);
       const mndRest = måneder === Infinity ? null : måneder % 12;
+      const totalKapital = (v.fondNå || 0) + (v.kontantbeholdning || 0) * 0.9;
+      // harKapital: brukeren har kapital nok i dag, men Frihetsplanen
+      // anbefaler alltid å spare seg frem — aldri å tømme beholdningen.
+      const harKapital = totalKapital >= kostnad;
       milepæler.push({
         id: mål.id, ikon: def.ikon, beskrivelse, kostnad, måneder, år, mndRest, grep,
-        nådd: v.fondNå >= kostnad,
+        harKapital,
       });
     }
   });
@@ -465,6 +479,7 @@ Beregn.beregnSammenligningsgraf = function(v, res) {
 // pluss en liste med tiltak (for presentasjon i handlingsplanen).
 
 Beregn.optimaliser = function(v, res) {
+  const r = FP.RATER;
   const tiltak = [];
   let ekstraMndTilFond = 0;
 
@@ -482,18 +497,19 @@ Beregn.optimaliser = function(v, res) {
   }
 
   // Regel 2: 90% av eksisterende månedlig sparing omdirigert til fond.
-  // NB: Alle milepæl-formler i Beregn.kjør() forutsetter allerede at v.sparingMnd
-  // vokser med fondsavkastning — dette feltet skiller ikke på bank/fond i dag.
-  // Regelen er fortsatt et reelt og verdifullt tiltak (pengene vokser faktisk raskere
-  // i praksis enn om de lå i banken), men den skal IKKE legges til som "ekstra" kr/mnd
-  // i tillegg til v.sparingMnd — det ville telt samme beløp to ganger.
+  // Vises som avkastningsvinning over 10 år, ikke som "ekstra kr/mnd" —
+  // siden det ikke er mer penger inn, bare bedre plassering av det som allerede spares.
   const eksisterendeSparing = v.sparingMnd || 0;
   if (eksisterendeSparing > 0) {
     const omdirigert = eksisterendeSparing * 0.9;
+    const bankVekst = Beregn.FVmnd(omdirigert, r.bankRente, 10);
+    const fondVekst = Beregn.FVmnd(omdirigert, r.fondAvkastning, 10);
+    const vinning10år = Math.round(fondVekst - bankVekst);
     tiltak.push({
-      type: 'mnd',
+      type: 'vinning',
       tekst: 'Flytt 90% av sparingen din til fond i stedet for bank',
       beløpMnd: omdirigert,
+      vinning10år,
     });
   }
 

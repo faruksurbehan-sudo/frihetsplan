@@ -838,6 +838,23 @@ body {
   color: var(--grønn);
   margin-top: 6px;
 }
+.fp-sammenligning-kontant-signal {
+  background: #eef6f1;
+  border: 1px solid var(--grønn);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--grønn);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+.fp-milepæl-kapital-note {
+  font-size: 11px;
+  color: var(--grønn);
+  font-family: var(--font-mono);
+  margin-top: 6px;
+  line-height: 1.5;
+}
 .fp-sammenligning-rad { text-align: center; }
 .fp-sammenligning-rad span { display: block; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
 .fp-sammenligning-rad strong { font-family: var(--font-display); font-size: 18px; color: var(--text); }
