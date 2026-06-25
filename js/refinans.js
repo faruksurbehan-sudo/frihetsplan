@@ -281,13 +281,37 @@ const Refinans = {
     return linjer.join('\n');
   },
 
-  sendHenvendelse: function() {
+  sendHenvendelse: async function() {
     const navn  = document.getElementById('rf-lead-navn').value.trim();
     const epost = document.getElementById('rf-lead-epost').value.trim();
     if (!navn || !epost) { alert('Fyll inn navn og e-post først.'); return; }
-    const kropp = 'Navn: ' + navn + '\nE-post: ' + epost + '\n\n' + Refinans.byggLeadTekst();
-    const emne  = 'Refinansieringshenvendelse fra ' + navn;
-    window.location.href = 'mailto:admin@frihetsplan.no?subject=' + encodeURIComponent(emne) + '&body=' + encodeURIComponent(kropp);
+
+    const knapp = document.querySelector('.rf-lead-seksjon .rf-knapp-primær');
+    if (knapp) { knapp.textContent = 'Sender...'; knapp.disabled = true; }
+
+    try {
+      const res = await fetch('https://formspree.io/f/xgojarqp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          navn,
+          epost,
+          melding: Refinans.byggLeadTekst(),
+        }),
+      });
+
+      if (res.ok) {
+        if (knapp) knapp.textContent = '✓ Sendt!';
+        document.getElementById('rf-lead-navn').value = '';
+        document.getElementById('rf-lead-epost').value = '';
+      } else {
+        if (knapp) { knapp.textContent = 'Send henvendelse'; knapp.disabled = false; }
+        alert('Noe gikk galt. Prøv igjen eller send e-post direkte til admin@frihetsplan.no');
+      }
+    } catch (e) {
+      if (knapp) { knapp.textContent = 'Send henvendelse'; knapp.disabled = false; }
+      alert('Noe gikk galt. Prøv igjen eller send e-post direkte til admin@frihetsplan.no');
+    }
   },
 };
 
