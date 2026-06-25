@@ -12,98 +12,13 @@
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Frihetsplanen — Privatøkonomi-kalkulator for nordmenn | Gratis</title>
-<meta name="description" content="Frihetsplanen viser deg konkret hva frihet koster, hvilke grep som finansierer den, og når du er der. Refinansiering, utleiebolig, bilkalkulator og mer. Gratis norsk verktøy for privatøkonomi.">
-<meta name="robots" content="index, follow">
-<link rel="canonical" href="https://frihetsplan.no/">
+<title>Frihetsplanen — Lev livet du faktisk vil leve</title>
+<meta name="description" content="Frihetsplanen viser deg konkret hva frihet koster, hvilke grep som finansierer den, og når du er der. Gratis norsk verktøy for privatøkonomi — uten å si nei til livet ditt.">
 <meta property="og:title" content="Frihetsplanen — Lev livet du faktisk vil leve">
-<meta property="og:description" content="Norske kalkulatorer for privatøkonomi: refinansiering, utleiebolig, bil og mer. Gratis og uavhengig.">
+<meta property="og:description" content="Se konkret hva frihet koster deg, og når du er der. Gratis og uavhengig.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://frihetsplan.no/">
-<meta property="og:locale" content="nb_NO">
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "Frihetsplanen",
-  "url": "https://frihetsplan.no/",
-  "description": "Gratis norske kalkulatorer og verktøy for privatøkonomi — refinansiering, utleiebolig, bil og personlig frihetsplan.",
-  "inLanguage": "no",
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": "https://frihetsplan.no/?q={search_term_string}",
-    "query-input": "required name=search_term_string"
-  }
-}
-</script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "Frihetsplanen",
-  "url": "https://frihetsplan.no/",
-  "contactPoint": {
-    "@type": "ContactPoint",
-    "email": "admin@frihetsplan.no",
-    "contactType": "customer support",
-    "availableLanguage": "Norwegian"
-  }
-}
-</script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "SiteNavigationElement",
-  "name": ["Frihetsplanen", "Finn din balanse", "Refinansiering", "Utleiebolig kalkulator", "Bil kalkulator"],
-  "url": [
-    "https://frihetsplan.no/",
-    "https://frihetsplan.no/retning.html",
-    "https://frihetsplan.no/refinansiering.html",
-    "https://frihetsplan.no/kalkulatorer/utleiebolig.html",
-    "https://frihetsplan.no/kalkulatorer/bil.html"
-  ]
-}
-</script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "Hva er Frihetsplanen?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Frihetsplanen er et gratis norsk verktøy for privatøkonomi. Du velger hva du vil ha frihet til, legger inn tallene dine, og får en konkret plan med milepæler, skjulte kostnader og grep som finansierer målene dine raskere."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Lagres dataene mine?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Nei. All data lagres kun lokalt i din egen nettleser (localStorage). Ingenting sendes til servere eller tredjeparter."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Hvilke kalkulatorer finnes på Frihetsplanen?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Frihetsplanen inneholder: en personlig frihetsplan-kalkulator, refinansieringskalkulator (samle lån og spare renter), utleiebolig-kalkulator (beholde eller selge?), bil-kalkulator (leie ut på Nabobil/Hyre, beholde eller selge?), og quizen Finn din balanse."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Lønner det seg å refinansiere lånene mine?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Det avhenger av rentedifferansen og gebyrene ved å bytte långiver. Refinansieringskalkulatoren på Frihetsplanen viser nøyaktig hva du sparer månedlig og totalt over lånets løpetid."
-      }
-    }
-  ]
-}
-</script>
+<link rel="canonical" href="https://frihetsplan.no/">
 <link rel="stylesheet" href="css/design.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 </head>
@@ -267,11 +182,37 @@
     <a class="fp-footer-cta" href="retning.html">Finn din balanse →</a>
 
     <div class="fp-footer-bunn">
-      <a class="fp-footer-kontakt" href="mailto:admin@frihetsplan.no">Kontakt meg</a>
+      <a class="fp-footer-kontakt" href="#" onclick="KontaktModal.åpne(); return false;">Kontakt meg</a>
       <span class="fp-footer-copyright">© 2026 Frihetsplanen. Alle rettigheter forbeholdt.</span>
     </div>
   </div>
 </footer>
+
+<!-- ═══════════════════════════════════════════════════════════
+     KONTAKT-MODAL
+═══════════════════════════════════════════════════════════ -->
+<div id="fp-kontakt-modal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#161616;border:1px solid #2a2a2a;border-radius:4px;padding:32px;max-width:460px;width:100%;position:relative;">
+    <button onclick="KontaktModal.lukk()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:#888;font-size:20px;cursor:pointer;line-height:1;">✕</button>
+    <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:400;color:#c8a96e;margin-bottom:6px;">Kontakt meg</div>
+    <p style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#666;margin-bottom:24px;">Spørsmål, tilbakemeldinger eller bare en hilsen — jeg leser alt.</p>
+
+    <div style="margin-bottom:14px;">
+      <label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#666;margin-bottom:6px;">Navn</label>
+      <input id="km-navn" type="text" placeholder="Ditt navn" style="width:100%;box-sizing:border-box;background:#1e1e1e;border:1px solid #2a2a2a;border-radius:2px;padding:11px 14px;font-family:'IBM Plex Sans',sans-serif;font-size:14px;color:#e8e4dc;outline:none;" onfocus="this.style.borderColor='#c8a96e'" onblur="this.style.borderColor='#2a2a2a'">
+    </div>
+    <div style="margin-bottom:14px;">
+      <label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#666;margin-bottom:6px;">E-post</label>
+      <input id="km-epost" type="email" placeholder="din@epost.no" style="width:100%;box-sizing:border-box;background:#1e1e1e;border:1px solid #2a2a2a;border-radius:2px;padding:11px 14px;font-family:'IBM Plex Sans',sans-serif;font-size:14px;color:#e8e4dc;outline:none;" onfocus="this.style.borderColor='#c8a96e'" onblur="this.style.borderColor='#2a2a2a'">
+    </div>
+    <div style="margin-bottom:20px;">
+      <label style="display:block;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#666;margin-bottom:6px;">Melding</label>
+      <textarea id="km-melding" rows="4" placeholder="Skriv her..." style="width:100%;box-sizing:border-box;background:#1e1e1e;border:1px solid #2a2a2a;border-radius:2px;padding:11px 14px;font-family:'IBM Plex Sans',sans-serif;font-size:14px;color:#e8e4dc;outline:none;resize:vertical;" onfocus="this.style.borderColor='#c8a96e'" onblur="this.style.borderColor='#2a2a2a'"></textarea>
+    </div>
+    <button id="km-send-knapp" onclick="KontaktModal.send()" style="width:100%;background:#c8a96e;color:#0e0e0e;border:none;border-radius:2px;padding:14px;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:0.5px;cursor:pointer;font-weight:500;">Send melding</button>
+    <div id="km-status" style="margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:12px;text-align:center;min-height:18px;"></div>
+  </div>
+</div>
 
 <!-- ═══════════════════════════════════════════════════════════
      SCRIPTS — rekkefølge er viktig
@@ -281,6 +222,74 @@
 <script src="js/beregn.js"></script>
 <script src="js/steg.js"></script>
 <script src="js/render.js"></script>
+<script>
+const KontaktModal = {
+  åpne: function() {
+    const modal = document.getElementById('fp-kontakt-modal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    document.getElementById('km-navn').focus();
+  },
+  lukk: function() {
+    document.getElementById('fp-kontakt-modal').style.display = 'none';
+    document.body.style.overflow = '';
+    document.getElementById('km-status').textContent = '';
+  },
+  send: async function() {
+    const navn    = document.getElementById('km-navn').value.trim();
+    const epost   = document.getElementById('km-epost').value.trim();
+    const melding = document.getElementById('km-melding').value.trim();
+    const status  = document.getElementById('km-status');
+    const knapp   = document.getElementById('km-send-knapp');
+
+    if (!navn || !epost || !melding) {
+      status.style.color = '#c06060';
+      status.textContent = 'Fyll inn alle felt.';
+      return;
+    }
+
+    knapp.textContent = 'Sender...';
+    knapp.disabled = true;
+
+    try {
+      const res = await fetch('https://formspree.io/f/xgojarqp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ navn, epost, melding }),
+      });
+
+      if (res.ok) {
+        status.style.color = '#7eb8a4';
+        status.textContent = '✓ Melding sendt!';
+        knapp.textContent = 'Send melding';
+        document.getElementById('km-navn').value = '';
+        document.getElementById('km-epost').value = '';
+        document.getElementById('km-melding').value = '';
+        setTimeout(() => KontaktModal.lukk(), 2000);
+      } else {
+        status.style.color = '#c06060';
+        status.textContent = 'Noe gikk galt. Prøv igjen.';
+        knapp.textContent = 'Send melding';
+        knapp.disabled = false;
+      }
+    } catch(e) {
+      status.style.color = '#c06060';
+      status.textContent = 'Noe gikk galt. Prøv igjen.';
+      knapp.textContent = 'Send melding';
+      knapp.disabled = false;
+    }
+  },
+};
+
+// Lukk modal ved klikk utenfor
+document.getElementById('fp-kontakt-modal').addEventListener('click', function(e) {
+  if (e.target === this) KontaktModal.lukk();
+});
+// Lukk med Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') KontaktModal.lukk();
+});
+</script>
 <script>
   // Boot — kjøres etter alle moduler er lastet
   document.addEventListener('DOMContentLoaded', function() {
@@ -316,34 +325,3 @@
 
 </body>
 </html>
-
-<!-- SEO-innholdsblokk -->
-<section style="max-width:760px;margin:0 auto;padding:48px 32px 64px;font-family:inherit;font-weight:300;color:#555;line-height:1.85;font-size:14px;" aria-label="Om Frihetsplanen">
-  <h2 style="font-size:20px;font-weight:400;color:#c8a96e;margin-bottom:14px;font-family:'Playfair Display',serif;">Hva er Frihetsplanen?</h2>
-  <p style="margin-bottom:20px;">Frihetsplanen er et gratis norsk verktøy for privatøkonomi — bygget rundt spørsmålet de fleste aldri stiller seg: hva vil jeg faktisk bruke pengene mine til? I stedet for å begynne med budsjett og sparing, begynner Frihetsplanen med målet. Du velger hva du vil ha frihet til — mer tid, tidligere pensjon, reise, bolig, bil — og verktøyet viser deg konkret hva det krever og hvilke grep som finansierer det.</p>
-  <p style="margin-bottom:36px;">All data lagres kun lokalt i nettleseren din. Ingenting sendes til servere. Ingen registrering kreves.</p>
-
-  <h2 style="font-size:20px;font-weight:400;color:#c8a96e;margin-bottom:14px;font-family:'Playfair Display',serif;">Kalkulatorer og verktøy</h2>
-  <ul style="margin:0 0 36px 20px;display:flex;flex-direction:column;gap:12px;list-style:disc;">
-    <li><a href="retning.html" style="color:#666;text-decoration:none;font-weight:400;">Finn din balanse</a> — En 8-spørsmåls quiz som avdekker din økonomiske personlighetstype og den naturlige balansen mellom nytelse nå og trygghet for fremtiden.</li>
-    <li><a href="refinansiering.html" style="color:#666;text-decoration:none;font-weight:400;">Refinansiering kalkulator</a> — Se nøyaktig hva du sparer per måned og totalt ved å samle lånene dine til én avtale med lavere rente. Inkluderer etableringskostnad og nedbetalingstid.</li>
-    <li><a href="kalkulatorer/utleiebolig.html" style="color:#666;text-decoration:none;font-weight:400;">Utleiebolig kalkulator</a> — Beholde eller selge sekundærboligen? Beregner totalresultat mot alternativ plassering i fond eller bank, med korrekt norsk skatt og formuesskatt.</li>
-    <li><a href="kalkulatorer/bil.html" style="color:#666;text-decoration:none;font-weight:400;">Bil kalkulator</a> — Lønner det seg å leie ut bilen på Nabobil eller Hyre? Inkluderer verdifall, 10 000 kr skattefri grense, formuesskatt og km-justerte kostnader.</li>
-  </ul>
-
-  <h2 style="font-size:20px;font-weight:400;color:#c8a96e;margin-bottom:14px;font-family:'Playfair Display',serif;">Vanlige spørsmål</h2>
-  <div style="border-top:1px solid #1e1e1e;padding-top:18px;margin-bottom:14px;">
-    <p style="color:#666;margin-bottom:8px;">Lagres dataene mine?</p>
-    <p>Nei. All data lagres utelukkende lokalt i nettleseren din via localStorage. Ingenting sendes til servere eller tredjeparter.</p>
-  </div>
-  <div style="border-top:1px solid #1e1e1e;padding-top:18px;margin-bottom:14px;">
-    <p style="color:#666;margin-bottom:8px;">Koster det noe å bruke Frihetsplanen?</p>
-    <p>Nei, alle verktøy og kalkulatorer er helt gratis.</p>
-  </div>
-  <div style="border-top:1px solid #1e1e1e;padding-top:18px;margin-bottom:32px;">
-    <p style="color:#666;margin-bottom:8px;">Hvem er dette for?</p>
-    <p>Frihetsplanen er laget for norske privatpersoner som vil ha kontroll på privatøkonomien — særlig for deg som eier bolig, bil eller andre eiendeler og lurer på om de arbeider hardt nok for deg, eller om pengene ville gjort mer nytte et annet sted.</p>
-  </div>
-
-  <p style="font-size:12px;color:#3a3a3a;border-top:1px solid #1e1e1e;padding-top:20px;">Frihetsplanen er ikke finansiell rådgivning. Kalkulatorer og beregninger er basert på 2025-regler og offentlig tilgjengelig informasjon. Sjekk alltid med en rådgiver for din konkrete situasjon.</p>
-</section>
